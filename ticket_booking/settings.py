@@ -132,11 +132,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 AWS_ACCESS_KEY_ID =  env("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
@@ -174,6 +176,16 @@ if DEBUG:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / "media"
 
+
+    STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
     
     
 else:
@@ -191,17 +203,26 @@ else:
 
     MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
 
-    
-    
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_X_FORWARDED_HOST = True
+    SECURE_SSL_REDIRECT = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_CONTENT_TYPE_NOSNIFF = False
+    SECURE_BROWSER_XSS_FILTER = False
 
     
-
-STORAGES = {
     
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    
+
+
 
 
 AUTH_USER_MODEL = 'accounts.User'
