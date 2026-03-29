@@ -1,0 +1,314 @@
+{% extends 'booking_app/base.html' %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Movies</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/movie_display.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<section class="herocontainer">
+
+    <div class="hero">
+
+        <div class="hero-image-area">
+                    
+             <img src="{% static 'images/movie_carosal.png' %}" class="hero-image-area">
+            
+        </div>
+            
+        
+
+        <div class="hero-text">
+
+            <p class="heading">Search Movies</p>
+            <p class="content">Find the best movies at best place</p>
+
+        </div>
+
+        <!-- TABS (FLOATING OVER HERO) -->
+        
+
+        <div class="search-card">
+
+            <div class="search-form">
+                <input type="text" id="movie" placeholder="Movies" name="movie">
+                <input type="text" id="city" placeholder="City" name="city">
+                <button class="search-btn" onclick="searchMovies()">Search Movies</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<div class="flight-container">
+
+    <!-- FILTER SIDEBAR -->
+    <div class="filter-sidebar">
+
+        <div class="filter-header">Filters</div>
+
+        <ul class="filter-list">
+
+
+            <li class="filter-item">
+                <div class="filter-title">
+                    Languages
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+                    {% for lang in languages %}
+                    <label class="custom-radio">
+                        <input type="radio" name="language" value="{{ lang }}">
+                        <span class="radio-circle"></span>
+                        {{ lang }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </li>
+
+            <li class="filter-item">
+                <div class="filter-title">
+                    Format
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+                    {% for f in format %}
+                    <label class="custom-radio">
+                        <input type="radio" name="format" value="{{ f }}">
+                        <span class="radio-circle"></span>
+                        {{ f }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </li>
+
+
+            <!-- AIRLINE -->
+            <li class="filter-item">
+                <div class="filter-title">
+                    Genres
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+                    {% for g in genre %}
+                    <label class="custom-radio">
+                        <input type="radio" name="genre" value="{{ g }}">
+                        <span class="radio-circle"></span>
+                        {{ g }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </li>
+
+            <li class="filter-item">
+                <div class="filter-title">
+                    Sort by
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+
+                    <label class="custom-radio">
+                        <input type="radio" name="sort" value="new_to_old" checked>
+                        <span class="radio-circle"></span>
+                        Release Date: New to Old
+                    </label>
+
+                    <label class="custom-radio">
+                        <input type="radio" name="sort" value="old_to_new">
+                        <span class="radio-circle"></span>
+                        Release Date: Old to New
+                    </label>
+
+                </div>
+            </li>
+
+        </ul>
+
+    </div>
+
+
+    <div id="movieResults">
+        <!-- RESULT AREA -->
+        {% for m in movies %} 
+        <div class="movie-card">
+
+            <div class="movie-image">
+                <img src="{{ m.poster.url }}">
+
+                <div class="overlay">
+                    <button class="book-btn"
+                        onclick="window.location.href='{% url 'movie_booking:show_selection' m.id %}'">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+
+            <div class="movie-info">
+                <h3>{{ m.title }}</h3>
+                <p>{{ m.language }}</p>
+            </div>
+
+        </div> 
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+
+function getCookie(name) {
+    let cookieValue = null;
+    document.cookie.split(';').forEach(cookie => {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        }
+    });
+    return cookieValue;
+}
+
+// ✅ CLEAN STATE
+let searchState = {
+    movie: "",
+    city: "",
+    languages: [],
+    format: [],
+    genre: "",
+    sort: "new_to_old",
+};
+
+
+// ✅ FILTER OPEN/CLOSE (WORKING)
+document.querySelectorAll(".filter-title").forEach(title => {
+    title.addEventListener("click", () => {
+        title.parentElement.classList.toggle("active");
+    });
+});
+
+
+// ✅ RADIO FILTERS
+document.addEventListener("change", function(e) {
+
+    if (e.target.name === "language") {
+        searchState.languages = [e.target.value];
+    }
+
+    if (e.target.name === "genre") {
+        searchState.genre = e.target.value;
+    }
+
+    if (e.target.name === "format") {
+        searchState.format = [e.target.value];
+    }
+
+    if (e.target.name === "sort") {
+        searchState.sort = e.target.value;
+    }
+
+    fetchMovies();
+});
+
+
+// ✅ SHOW TIME FILTER
+document.querySelectorAll(".time-box").forEach(box => {
+
+    box.onclick = () => {
+
+        box.classList.toggle("active");
+
+        let slot = box.dataset.slot;
+
+        if (box.classList.contains("active")) {
+            if (!searchState.show_slots.includes(slot)) {
+                searchState.show_slots.push(slot);
+            }
+        } else {
+            searchState.show_slots =
+                searchState.show_slots.filter(s => s !== slot);
+        }
+
+        fetchMovies();
+    };
+});
+
+
+// ✅ SEARCH BUTTON
+function searchMovies() {
+    searchState.movie = document.getElementById("movie").value;
+    searchState.city = document.getElementById("city").value;
+    fetchMovies();
+}
+
+
+// ✅ FETCH
+function fetchMovies() {
+
+    fetch("/movies/search/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify(searchState)
+    })
+    .then(res => res.json())
+    .then(data => renderMovies(data.movies))
+    .catch(err => console.error(err));
+}
+
+
+// ✅ RENDER MOVIES
+function renderMovies(movies) {
+
+    let container = document.getElementById("movieResults");
+    container.innerHTML = "";
+
+    if (!movies.length) {
+        container.innerHTML = "<p>No movies found</p>";
+        return;
+    }
+
+    movies.forEach(movie => {
+        container.innerHTML += `
+
+        <div class="movie-card">
+
+            <div class="movie-image">
+                <img src="${movie.poster}">
+
+                <div class="overlay">
+                    <button class="book-btn"
+                        onclick="window.location.href='/movies/show-selection/${movie.id}/'">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+
+            <div class="movie-info">
+                <h3>${movie.title}</h3>
+                <p>${movie.language}</p>
+            </div>
+
+        </div>
+        `;
+    });
+}
+
+</script>
+
+{% endblock %}

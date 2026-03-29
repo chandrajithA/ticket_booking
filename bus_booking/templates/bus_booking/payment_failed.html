@@ -1,0 +1,88 @@
+{% extends 'booking_app/base.html' %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Payment Failed</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/bus_payment_failed.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="flight-success-container">
+
+    <!-- TOP HEADER -->
+    <div class="top-header">
+        <h2>Booking Cancelled</h2>
+        <p>Your booking has been Cancelled.</p>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <div class="row">
+            <span>Booking Reference</span>
+            <strong>{{booking.booking_reference}}</strong>
+        </div>
+
+        <div class="row">
+            <span>Booking Cancel Date</span>
+            <strong>{{booking.cancelled_at|date:"F j, Y - h:i A"}}</strong>
+        </div>
+
+        <hr>
+
+        <h3>Booking Details</h3>
+
+        <!-- Flight -->
+        <div class="detail">
+            <div class="icon"><img src="{% static 'images/train_icon.png' %}"></div>
+            <div>
+                <p class="title">Trip to {{booking.trip.schedule.arrival.name}} ({{booking.trip.schedule.arrival.city}})</p>
+                <p class="sub">Travels - {{booking.trip.schedule.bus.brand.name}}</p>
+            </div>
+        </div>
+
+        <!-- Date -->
+        <div class="detail">
+            <div class="icon"><img src="{% static 'images/red-calender.png' %}"></div>
+            <div>
+                <p class="title">{{booking.trip.travel_date}}</p>
+                <p class="sub">{{booking.trip.schedule.boarding_time|time:"h:i A"}} - {{booking.trip.schedule.arrival_time|time:"h:i A"}}</p>
+            </div>
+        </div>
+
+        <!-- Route -->
+        <div class="detail">
+            <div class="icon"><img src="{% static 'images/red-location.png' %}"></div>
+            <div>
+                <p class="title">Route</p>
+                <p class="sub">{{booking.trip.schedule.boarding.name}} ({{booking.trip.schedule.boarding.city}}) to {{booking.trip.schedule.arrival.name}} ({{booking.trip.schedule.arrival.city}})</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- TOTAL -->
+        <div class="total">
+            <span>Total Amount </span>
+            <strong>₹{{booking.total_amount}}</strong>
+        </div>
+
+        <!-- BUTTON -->
+        <div class="actions">
+            <a href="{% url "bus_booking:bus_display" %}" class="search-flight-btn">Search Buses</a>
+        </div>
+
+    </div>  
+
+</div>
+
+<p class="return-link"><a href="{% url 'booking_app:index_page' %}">Return Home</a></p>
+
+{% endblock %}
+
+
+{% block script %}
+
+{% endblock %}

@@ -1,0 +1,770 @@
+{% extends 'booking_app/base.html' %}
+{% load time_filters %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Flight Passenger Details</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/flight_passenger_details.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+
+
+<div class="passenger-container">
+
+    <!-- LEFT SIDE -->
+    <div class="left-card">
+        <div class="card-header">Passenger Info</div>
+
+        <!-- SEAT -->
+         
+        <div class="input-icon full">
+            <img src="{% static 'images/economy.png' %}">
+            <div class="select-wrapper">
+                <select id="seat_select" class="input">
+                    {% for seat in seat_list %}
+                        <option value="{{ seat.seat.id }}">
+                            {{ seat.seat.seat_number }} - {{ seat.seat.seat_class|capfirst }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- PASSENGER + NAME -->
+        <div class="row">
+            <div class="input-icon">
+                <img src="{% static 'images/passengers.png' %}">
+                <div class="select-wrapper">
+                    <select id="passenger_number" class="input">
+                    {% for i in passenger_count %}
+                        <option value="{{ forloop.counter }}">
+                            Passenger {{ forloop.counter }}
+                        </option>
+                    {% endfor %}
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="input-icon">
+                <input type="text" id="first_name" placeholder="First Name*" class="input">
+            </div>
+
+            <div class="input-icon">
+                <input type="text" id="last_name" placeholder="Last Name" class="input">
+            </div>
+        </div>
+
+        <!-- GENDER + DOB -->
+        <div class="row align-center">
+
+            <div class="gender-wrapper">
+                <label style="margin-bottom:20px;display:block;">Select Gender</label>
+                <div class="gender-group">
+                    <div class="gender-box active" data-value="male">
+                        <img src="{% static 'images/male.png' %}">
+                        <span>Male</span>
+                    </div>
+
+                    <div class="gender-box" data-value="female">
+                        <img src="{% static 'images/female.png' %}">
+                        <span>Female</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dob-wrapper">
+                <label>Date of Birth</label>
+                <div class="input-icon">
+                    <img src="{% static 'images/calendar.png' %}">
+                    <input type="text" placeholder="DD/MM/YYYY*" class="input" id="dobDateInput" autocomplete="off" name="dob">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- NATIONALITY + PHONE -->
+        <div class="row">
+            <div class="input-icon">
+                <img src="{% static 'images/globe.png' %}">
+                <input type="text" id="nationality" placeholder="Nationality*" class="input">
+            </div>
+
+            <div class="input-icon">
+                <img src="{% static 'images/blackphone.png' %}">
+                <input type="text" id="phone" placeholder="Phone Number*" class="input">
+            </div>
+        </div>
+
+        <!-- EMAIL + ADDRESS -->
+        <div class="row">
+            <div class="input-icon">
+                <img src="{% static 'images/mail_black.png' %}">
+                <input type="email" id="email" placeholder="Email*" class="input">
+            </div>
+
+            <div class="input-icon">
+                <img src="{% static 'images/location_black.png' %}">
+                <input type="text" id="address" placeholder="Address*" class="input">
+            </div>
+        </div>
+
+        <!-- PINCODE + PASSPORT -->
+        <div class="row">
+            <div class="input-icon">
+                <img src="{% static 'images/mailbox.png' %}">
+                <input type="text" id="pincode" placeholder="Post Code*" class="input">
+            </div>
+
+            <div class="input-icon">
+                <img src="{% static 'images/passport.png' %}">
+                <input type="text" id="passport" placeholder="Passport No" class="input">
+            </div>
+        </div>
+
+        <!-- REQUEST OPTIONS -->
+        <div class="section-title">Request Option</div>
+
+        <div class="input-icon full">
+            <select id="meal" class="input">
+                <option value="none" data-price="{{ meal_prices.none }}">Select Meal Type (Optional)</option>
+                <option value="veg" data-price="{{ meal_prices.veg }}">Veg</option>
+                <option value="non_veg" data-price="{{ meal_prices.non_veg }}">Non-Veg</option>
+                <option value="vegan" data-price="{{ meal_prices.vegan }}">Vegan</option>
+                <option value="child" data-price="{{ meal_prices.child }}">Child Meal</option>
+            </select>
+        </div>
+
+        <div class="input-icon full">
+            <select id="luggage" class="input">
+                <option value="none" data-price="{{ luggage_prices.none }}">Luggage (Optional)</option>
+                <option value="cabin" data-price="{{ luggage_prices.cabin }}">Cabin Baggage (7 Kg)</option>
+                <option value="checkin" data-price="{{ luggage_prices.checkin }}">Check-in Baggage (15 Kg)</option>
+                <option value="extra_5" data-price="{{ luggage_prices.extra_5 }}">Add Extra Baggage - +5Kg ₹800</option>
+                <option value="extra_10" data-price="{{ luggage_prices.extra_10 }}">Add Extra Baggage - +10Kg ₹1500</option>
+            </select>
+        </div>
+
+        <div class="input-icon full">
+            <select id="babycarrier" class="input">
+                <option value="none">Baby Carrier (Optional)</option>
+                <option value="single">Single Baby Carrier (7 Kg)</option>
+                <option value="double">Double Baby Carrier (15 Kg)</option>
+            </select>
+        </div>
+
+        <div class="input-icon full">
+            <select id="wheelchair" class="input">
+                <option value="none">Wheel Chair (Optional)</option>
+                <option value="lift">Wheel Chair to Lift</option>
+                <option value="seat">Wheel Chair to Seat</option>
+                <option value="door">Wheel Chair to Aircraft Door</option>
+            </select>
+        </div>
+
+        <!-- ADD BUTTON -->
+        <button id="addPassengerBtn" class="add-btn">Add Passenger</button>
+
+        <div id="passengerList"></div>
+
+    </div>
+
+
+    <!-- RIGHT SIDE -->
+    <div class="right-card">
+        <div class="card-header">Booking Info</div>
+
+        <!-- FLIGHT TOP -->
+        <!-- TOP -->
+        <div class="top-row">
+            <span>Time Left:</span><div id="timer" style="font-size:18px; color:red;"></div>
+            <button id="cancelBookingBtn" class="booking-cancel-btn">Cancel Booking</button>
+        </div>
+
+        <hr>
+
+        <div class="top-row">
+            <img src="{{ booking.trip.schedule.flight.brand.picture.url }}" class="logo">
+            <div class="airline-name">
+                {{ booking.trip.schedule.flight.brand.name }}
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- FLIGHT INFO -->
+        <div class="info-row">
+            <div>
+                <p class="value">Flight Number: {{ booking.trip.schedule.flight.flight_number }}</p>
+            </div>
+
+            <div class="right">
+                <img src="{% static 'images/clock_icon.png' %}" class="clock">
+                <span class="value">{{ booking.trip.schedule.duration|format_duration }}</span>
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div>
+                <p class="value">Aircraft: {{ booking.trip.schedule.flight.flight_name }}</p>
+            </div>
+
+            <div class="right">
+                <p class="value">Non Stop</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <p class="label">Date : {{ booking.trip.travel_date }}</p>
+
+        <!-- ROUTE -->
+        <div class="route">
+
+            <div class="col">
+                <p class="label">Departure</p>
+                <p class="value">{{ booking.trip.schedule.boarding }}</p>
+                <p class="value">{{ booking.trip.schedule.boarding_time|time:"h:i A" }}</p>
+                <p class="value">Terminal {{ booking.trip.schedule.boarding_terminal.name }}</p>
+            </div>
+
+            <div class="col arrival-right">
+                <p class="label">Arrival</p>
+                <p class="value">{{ booking.trip.schedule.arrival }}</p>
+                <p class="value">{{ booking.trip.schedule.arrival_time|time:"h:i A" }}</p>
+                <p class="value">Terminal {{ booking.trip.schedule.arrival_terminal.name }}</p>
+            </div>
+
+        </div>
+
+        <hr>
+
+        <!-- DISCOUNT -->
+        <div class="section">
+            <p class="section-title">Discount Option</p>
+
+            <div class="coupon">
+                <span class="gear">⚙</span>
+                <input type="text" placeholder="Enter Code">
+                <button><span>→</span></button>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- FARE -->
+        <div class="section">
+            <p class="section-title">Fare Details</p>
+
+            <div class="fare-row">
+                <span>Ticket Price</span>
+                <span>₹<span id="ticketPrice">{{ total_ticket_price }}</span></span>
+            </div>
+
+            <div class="fare-row">
+                <span>Food</span>
+                <span>₹<span id="foodPrice">0</span></span>
+            </div>
+
+            <div class="fare-row">
+                <span>Luggage</span>
+                <span>₹<span id="luggagePrice">0</span></span>
+            </div>
+
+            <div class="fare-row">
+                <span>Tax (5%) </span>
+                <span>₹<span id="taxPrice">0</span></span>
+            </div>
+
+            <div class="fare-row total">
+                <span>Total Price</span>
+                <span>₹<span id="totalPrice">{{ total_ticket_price }}</span></span>
+            </div>
+        </div>
+
+        <!-- BUTTON -->
+        <button class="pay-btn" onclick="startPayment()">Continue Payment</button>
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+
+let selectedGender = "male";
+let totalAdded = 0;
+const totalPassengers = parseInt("{{ total_passengers }}");
+
+
+
+// CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie) {
+        document.cookie.split(';').forEach(cookie => {
+            if (cookie.trim().startsWith(name + '=')) {
+                cookieValue = cookie.split('=')[1];
+            }
+        });
+    }
+    return cookieValue;
+}
+
+
+
+
+
+let dobPicker = flatpickr("#dobDateInput", {
+    dateFormat: "Y-m-d",
+    altInput: true, 
+    altFormat: "d-m-Y", 
+    maxDate: "today",
+    defaultDate: null,
+    allowInput: true
+});
+
+
+
+
+// GENDER SELECT
+document.querySelectorAll(".gender-box").forEach(box => {
+    box.addEventListener("click", () => {
+        document.querySelectorAll(".gender-box").forEach(b => b.classList.remove("active"));
+        box.classList.add("active");
+        selectedGender = box.dataset.value;
+    });
+});
+
+
+
+
+
+document.getElementById("addPassengerBtn").addEventListener("click", function () {
+
+    if (!validateForm()) return;
+
+    if (!/^\d{10}$/.test(document.getElementById("phone").value)) {
+        alert("Enter valid 10 digit phone number");
+        return false;
+    }
+
+    if (!/^\d{10}$/.test(document.getElementById("phone").value)) {
+        alert("Enter valid 10 digit phone number");
+        return false;
+    }
+
+    let seatSelect = document.getElementById("seat_select");
+    let seat_id = seatSelect.value;
+
+    let passenger_number = document.getElementById("passenger_number").value;
+
+    let meal = document.getElementById("meal");
+    let luggage = document.getElementById("luggage");
+    let babycarrier = document.getElementById("babycarrier").value;
+    let wheelchair = document.getElementById("wheelchair").value;
+
+    let meal_price = meal.options[meal.selectedIndex].dataset.price;
+    let luggage_price = luggage.options[luggage.selectedIndex].dataset.price;
+
+    const data = {
+        passenger_number,
+        first_name: document.getElementById("first_name").value,
+        last_name: document.getElementById("last_name").value,
+        gender: selectedGender,
+        dob: document.getElementById("dobDateInput").value,
+        nationality: document.getElementById("nationality").value,
+        phone: document.getElementById("phone").value,
+        email: document.getElementById("email").value,
+        address: document.getElementById("address").value,
+        pincode: document.getElementById("pincode").value,
+        seat_id: seat_id,
+        meal_type: meal.value,
+        baggage_type: luggage.value,
+        baby_carrier: babycarrier,   // ✅ ADD THIS
+        wheel_chair: wheelchair 
+
+    };
+
+    fetch(`/flights/add-passenger/{{ booking.id }}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+
+            // ✅ REMOVE SEAT OPTION
+            seatSelect.querySelector(`option[value="${seat_id}"]`).remove();
+
+            // ✅ REMOVE PASSENGER NUMBER
+            document.querySelector(`#passenger_number option[value="${passenger_number}"]`).remove();
+
+            // ✅ ADD UI
+            let div = document.createElement("div");
+            div.classList.add("passenger-card");
+            div.id = `passenger-${res.passenger_id}`;
+
+            let gender = data.gender;
+
+            div.innerHTML = `
+                <div class="passenger-left">
+                
+                    <div class="passenger-info">
+                        <div class="passenger-name">
+                            ${data.first_name.charAt(0).toUpperCase() + data.first_name.slice(1)} ${data.last_name.charAt(0).toUpperCase() + data.last_name.slice(1)} - ${gender.charAt(0).toUpperCase() + gender.slice(1)}
+                        </div>
+                        <div class="passenger-details">
+                            Age: ${res.age_label || '-'} |
+                            Seat: 
+                            <span class="seat-badge">
+                                ${res.seat_number.charAt(0).toUpperCase() + res.seat_number.slice(1)} - ${res.seat_class.charAt(0).toUpperCase() + res.seat_class.slice(1)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="delete-btn"
+                    onclick="deletePassenger(${res.passenger_id}, '${seat_id}', '${passenger_number}', '${meal_price}', '${luggage_price}', '${res.seat_class}')">
+                    Delete
+                </button>
+            `;
+
+            document.getElementById("passengerList").appendChild(div);
+
+            document.getElementById("first_name").value = "";
+            document.getElementById("last_name").value = "";
+            document.getElementById("nationality").value = "";
+            document.getElementById("phone").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("address").value = "";
+            document.getElementById("pincode").value = "";
+            document.getElementById("passport").value = "";
+            dobPicker.clear();
+
+            // RESET DROPDOWNS
+            document.getElementById("meal").selectedIndex = 0;
+            document.getElementById("luggage").selectedIndex = 0;
+            document.getElementById("babycarrier").selectedIndex = 0;
+            document.getElementById("wheelchair").selectedIndex = 0;
+
+            // RESET GENDER
+            document.querySelectorAll(".gender-box").forEach(b => b.classList.remove("active"));
+            document.querySelector(".gender-box[data-value='male']").classList.add("active");
+            selectedGender = "male";
+
+            totalFood += parseFloat(meal_price || 0);
+            totalLuggage += parseFloat(luggage_price || 0);
+
+            updatePriceUI();
+
+            alert("Passenger Added ✅");
+        }
+    });
+});
+
+
+
+
+
+
+function deletePassenger(passenger_id, seat_id, passenger_number, meal_price, luggage_price, seat_class) {
+
+    fetch(`/flights/delete-passenger/${passenger_id}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+
+            // remove UI
+            document.getElementById(`passenger-${passenger_id}`).remove();
+
+            // restore seat
+            let seatSelect = document.getElementById("seat_select");
+            let option = document.createElement("option");
+            option.value = seat_id;
+            option.text = `${res.seat_number} - ${seat_class}`;
+            seatSelect.appendChild(option);
+
+            // restore passenger number
+            let pSelect = document.getElementById("passenger_number");
+            let opt = document.createElement("option");
+            opt.value = passenger_number;
+            opt.text = `Passenger ${passenger_number}`;
+            pSelect.appendChild(opt);
+
+            totalFood -= parseFloat(meal_price || 0);
+            totalLuggage -= parseFloat(luggage_price || 0);
+
+            updatePriceUI();
+        }
+    });
+}
+
+
+
+
+function validateForm() {
+
+    let requiredFields = [
+        "seat_select",
+        "passenger_number",
+        "first_name",
+        "dobDateInput",
+        "nationality",
+        "phone",
+        "email",
+        "address",
+        "pincode"
+    ];
+
+    for (let id of requiredFields) {
+        let el = document.getElementById(id);
+
+        if (!el || el.value.trim() === "") {
+            alert("Please fill all required fields");
+            el.focus();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+
+
+
+if (document.getElementById("passenger_number").options.length === 0) {
+    let opt = document.createElement("option");
+    opt.text = "All Passengers Added";
+    opt.disabled = true;
+    opt.selected = true;
+    document.getElementById("passenger_number").appendChild(opt);
+}
+
+
+
+
+
+let baseTicketPrice = parseFloat("{{ total_ticket_price }}");
+let totalFood = 0;
+let totalLuggage = 0;
+let taxPercent = 5;
+
+function updatePriceUI() {
+
+    let subtotal = baseTicketPrice + totalFood + totalLuggage;
+    let tax = (subtotal * taxPercent) / 100;
+    let total = subtotal + tax;
+
+    document.querySelector("#foodPrice").innerText = totalFood.toFixed(2);
+    document.querySelector("#luggagePrice").innerText = totalLuggage.toFixed(2);
+    document.querySelector("#taxPrice").innerText = tax.toFixed(2);
+    document.querySelector("#totalPrice").innerText = total.toFixed(2);
+}
+
+
+function updateGstPriceUI() {
+    let subtotal = baseTicketPrice;
+    let tax = (subtotal * taxPercent) / 100;
+    let total = subtotal + tax;
+
+    document.querySelector("#taxPrice").innerText = tax.toFixed(2);
+    document.querySelector("#totalPrice").innerText = total.toFixed(2);
+
+}
+
+
+
+
+function cancelBooking() {
+    return fetch("/flights/cancel-booking/{{ booking.id }}/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    }).then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'flight_booking:payment_failed' booking.id %}";
+        }
+        else {
+            window.location.href = "{% url 'flight_booking:seat_selection' booking.trip.id %}";
+        }
+    });
+}
+
+
+
+
+
+function expireBooking() {
+    return fetch("/flights/expire-booking/{{ booking.id }}/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    }).then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'flight_booking:seat_selection' booking.trip.id %}";
+        }
+        else {
+            window.location.href = "{% url 'flight_booking:seat_selection' booking.trip.id %}";
+        }
+    });
+}
+
+
+
+
+const expiryTime = {{ expiry_time|safe }} * 1000; // convert to ms
+const timerEl = document.getElementById("timer");
+
+const interval = setInterval(() => {
+
+    const now = new Date().getTime();
+    const distance = expiryTime - now;
+
+    if (distance <= 0) {
+
+        clearInterval(interval);
+        timerEl.innerHTML = "Time Out";
+
+        console.log("Timer Out → Booking Cancelled");
+
+        expireBooking();
+
+        return;
+    }
+
+    const minutes = Math.floor(distance / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    timerEl.innerHTML = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+}, 1000);
+
+
+
+
+
+function startPayment() {
+
+    let addedPassengers = document.querySelectorAll(".passenger-card").length;
+    let totalPassengers = {{ booking.total_passengers }};
+
+    if (addedPassengers < totalPassengers) {
+        alert("Please add all passengers before payment");
+        return;
+    }
+
+    fetch("{% url 'flight_booking:create_payment_order' booking.id %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (!data.success) {
+            alert("Unable to start payment");
+            return;
+        }
+
+        openRazorpay(data);
+    });
+}
+
+
+function openRazorpay(data) {
+
+    var options = {
+        "key": data.key,
+        "amount": data.amount,
+        "currency": "INR",
+        "name": "TravelVerse",
+        "description": "Flight Booking",
+        "order_id": data.order_id,
+
+        "handler": function (response) {
+            verifyPayment(response);
+        },
+
+        "modal": {
+            "ondismiss": function () {
+                
+                    cancelBooking();
+                  
+            }
+        }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+}
+
+
+
+
+
+function verifyPayment(response) {
+
+    fetch("{% url 'flight_booking:verify_payment' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify(response)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'flight_booking:payment_success' booking.id %}";
+        } else {
+            cancelBooking();
+        }
+    })
+    .catch(() => {
+        cancelBooking();
+    });
+}
+
+
+document.getElementById("cancelBookingBtn").addEventListener("click", function () {
+
+    if (!confirm("Are you sure you want to cancel booking?")) return;
+
+    cancelBooking()
+
+});
+
+
+updateGstPriceUI();
+
+
+</script>
+
+{% endblock %}

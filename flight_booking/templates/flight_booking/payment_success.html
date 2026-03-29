@@ -1,0 +1,98 @@
+{% extends 'booking_app/base.html' %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Payment Success</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/flight_payment_success.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="flight-success-container">
+
+    <!-- TOP HEADER -->
+    <div class="top-header">
+        <h2>Booking Confirmed!</h2>
+        <p>Your booking has been successfully confirmed</p>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <div class="row">
+            <span>Booking Reference</span>
+            <strong>{{booking.booking_reference}}</strong>
+        </div>
+
+        <div class="row">
+            <span>Booking Date</span>
+            <strong>{{booking.booking_date|date:"F j, Y - h:i A"}}</strong>
+        </div>
+
+        <hr>
+
+        <h3>Booking Details</h3>
+
+        <!-- Flight -->
+        <div class="detail">
+            <div class="icon"><img src="{% static 'images/red-flight.png' %}"></div>
+            <div>
+                <p class="title">Flight to {{booking.trip.schedule.arrival.name}} ({{booking.trip.schedule.arrival.code}})</p>
+                <p class="sub">{{booking.trip.schedule.flight.brand.name}} Airline</p>
+            </div>
+        </div>
+
+        <!-- Date -->
+        <div class="detail">
+            <div class="icon"><img src="{% static 'images/red-calender.png' %}"></div>
+            <div>
+                <p class="title">{{booking.trip.travel_date}}</p>
+                <p class="sub">{{booking.trip.schedule.boarding_time|time:"h:i A"}} - {{booking.trip.schedule.arrival_time|time:"h:i A"}}</p>
+            </div>
+        </div>
+
+        <!-- Route -->
+        <div class="detail">
+            <div class="icon"><img src="{% static 'images/red-location.png' %}"></div>
+            <div>
+                <p class="title">Route</p>
+                <p class="sub">{{booking.trip.schedule.boarding.name}} ({{booking.trip.schedule.boarding.code}}) to {{booking.trip.schedule.arrival.name}} ({{booking.trip.schedule.arrival.code}})</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- TOTAL -->
+        <div class="total">
+            <span>Total Amount Paid</span>
+            <strong>₹{{booking.total_amount}}</strong>
+        </div>
+
+        <!-- BUTTON -->
+        <div class="actions">
+            <a class="download-btn">Download Ticket</a>
+        </div>
+
+        <div class="actions">
+            <a href="{% url "flight_booking:flights_display" %}" class="search-flight-btn">Search Flight</a>
+        </div>
+
+        <p class="footer-text">
+            A confirmation email has been sent to your registered email address
+        </p>
+
+    </div>
+
+    
+
+</div>
+
+<p class="return-link"><a href="{% url 'booking_app:index_page' %}">Return Home</a></p>
+
+{% endblock %}
+
+
+{% block script %}
+
+{% endblock %}

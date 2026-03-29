@@ -1,0 +1,237 @@
+{% extends 'booking_app/base.html' %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Flight Seat Selection</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/flights_seatlayout.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="seat-layout-container">
+
+    <div class="seat-map">
+        <div class="seat-wrapper">
+            <div class="flight-position">Front</div>
+            <!-- COLUMN HEADER -->
+            {% for row, seats in seat_rows.items %}
+            <div class="seat-row">
+
+                <!-- Row Number -->
+                
+
+                {% for s in seats %}
+
+                    <!-- Aisle Gap -->
+                    {% if s.seat.is_left_aisle %}
+                        <div class="left-aisle-gap"></div>
+                    {% endif %}
+                    
+
+                    <!-- Seat -->
+                    
+                    <div class="seat 
+                        {% if s.status == 'booked' %}booked
+                        {% elif s.status == 'locked' %}locked
+                        {% elif s.status == 'available' %}available
+                        {% endif %}"
+                        data-seat-number="{{ s.seat.seat_number }}"
+                        data-seat-class="{{ s.seat.seat_class }}" 
+                        data-seat-price="{{s.seat_price}}"
+                    >
+                        
+                        {% if s.status == 'booked' %}<img src="{% static 'images/booked.png' %}">
+                        {% elif s.status == 'locked' %}<img src="{% static 'images/locked.png' %}">
+                        {% elif s.status == 'available' %}
+                            {% if s.seat.seat_class == 'first' %}
+                                <img src="{% static 'images/first.png' %}">
+                            {% elif s.seat.seat_class == 'business' %}
+                                <img src="{% static 'images/business.png' %}">
+                            {% elif s.seat.seat_class == 'economy' %}
+                                <img src="{% static 'images/economy.png' %}">
+                            {% endif %}
+                        {% endif %}
+                        <div class="row-label">{{ s.seat.seat_number }}</div>
+                    </div>
+
+                    {% if s.seat.is_right_aisle %}
+                        <div class="right-aisle-gap"></div>
+                    {% endif %}
+                    
+
+                {% endfor %}
+
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <div class="booking-panel">
+
+        <!-- 💳 BOOKING SUMMARY -->
+        <div class="summary-box">
+            <h3>Booking Summary</h3>
+
+            <p>Seats: <span id="selectedSeatsText">None</span></p>
+            <p>Total Seats: <span id="seatCount">0</span></p>
+            <p>Total Amount: ₹<span id="totalAmount">0</span></p>
+
+            <form method="POST" action="{% url 'flight_booking:initiate_booking' trip_id %}">
+                {% csrf_token %}
+                <input type="hidden" name="selected_seats" id="selectedSeatsInput">
+                <button type="submit" class="book-btn">Add Passengers</button>
+            </form>
+        </div>
+
+        <!-- 🎯 LEGEND -->
+        <div class="legend-box">
+            <h3>Seat Categories</h3>
+
+            <div class="legend-item">
+                <img src="{% static 'images/first.png' %}">
+                <span>First Class (<span id="firstCount">0</span>)</span>
+            </div>
+
+            <div class="legend-item">
+                <img src="{% static 'images/business.png' %}">
+                <span>Business (<span id="businessCount">0</span>)</span>
+            </div>
+
+            <div class="legend-item">
+                <img src="{% static 'images/economy.png' %}">
+                <span>Economy (<span id="economyCount">0</span>)</span>
+            </div>
+
+            <div class="legend-item">
+                <img src="{% static 'images/booked.png' %}">
+                <span>Booked</span>
+            </div>
+
+            <div class="legend-item">
+                <img src="{% static 'images/selected.png' %}">
+                <span>Selected</span>
+            </div>
+
+            <div class="legend-item">
+                <img src="{% static 'images/locked.png' %}">
+                <span>Locked - Will Unlock if not booked </span>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+
+const selectedImg = "{% static 'images/selected.png' %}";
+let selectedSeats = [];
+let totalAmount = 0;
+const MAX_SELECTION = 5;
+
+let classCounts = {
+    first: 0,
+    business: 0,
+    economy: 0
+};
+
+
+// disable booked & locked seats
+document.querySelectorAll('.seat.booked, .seat.locked').forEach(seat => {
+    seat.style.pointerEvents = "none";
+});
+
+
+
+
+// click event
+document.querySelectorAll('.seat.available').forEach(seat => {
+
+    seat.addEventListener('click', function () {
+
+        const seatNumber = this.dataset.seatNumber;
+        const price = parseFloat(this.dataset.seatPrice);
+        const seatClass = this.dataset.seatClass;   // ✅ FIX ADDED
+        const img = this.querySelector('img');
+
+        // REMOVE
+        if (this.classList.contains('selected')) {
+
+            this.classList.remove('selected');
+
+            selectedSeats = selectedSeats.filter(s => s !== seatNumber);
+            totalAmount -= price;
+
+            classCounts[seatClass] -= 1;
+
+            // restore image
+            if (seatClass === 'first') {
+                img.src = "{% static 'images/first.png' %}";
+            } else if (seatClass === 'business') {
+                img.src = "{% static 'images/business.png' %}";
+            } else {
+                img.src = "{% static 'images/economy.png' %}";
+            }
+        }
+
+        // ADD
+        else {
+
+            if (selectedSeats.length >= MAX_SELECTION) {
+                alert("Max 5 seats only!");
+                return;
+            }
+
+            this.classList.add('selected');
+
+            selectedSeats.push(seatNumber);
+            totalAmount += price;
+
+            classCounts[seatClass] += 1;
+
+            img.src = selectedImg;
+        }
+
+        updateSummary();
+    });
+
+});
+
+
+// On form submit → send data
+document.querySelector("form").addEventListener("submit", function (e) {
+
+    if (selectedSeats.length === 0) {
+        e.preventDefault();
+        alert("Please select at least one seat!");
+        return;
+    }
+
+    document.getElementById("selectedSeatsInput").value = selectedSeats.join(',');
+});
+
+
+function updateSummary() {
+    document.getElementById("selectedSeatsText").innerText =
+        selectedSeats.length ? selectedSeats.join(', ') : "None";
+
+    document.getElementById("seatCount").innerText = selectedSeats.length;
+    document.getElementById("totalAmount").innerText = totalAmount;
+
+    // ✅ update class counts
+    document.getElementById("firstCount").innerText = classCounts.first;
+    document.getElementById("businessCount").innerText = classCounts.business;
+    document.getElementById("economyCount").innerText = classCounts.economy;
+}
+
+</script>
+
+{% endblock %}

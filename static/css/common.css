@@ -1,0 +1,36 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+:root {
+  --black:#032626;
+  --greenish-blue: #008080;
+  --red: #F44336;
+  --light-red: #FF6F61;
+  --orange:#FFB803;
+  --yellow: #FFE236;
+  --white: #ffffff;
+  --light-grey: #eaeaead3;
+  --grey: #ddd;
+  --dark-grey:#a6a6a6;
+
+}
+
+body{
+    background: var(--white);
+}
+
+html{
+    min-width: 320px;
+    scroll-behavior: smooth;
+}
+
+a{
+    text-decoration: none;
+}
+
+
+

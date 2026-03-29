@@ -1,0 +1,533 @@
+{% extends 'booking_app/base.html' %}
+{% load time_filters %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Trains</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/train_display.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<section class="herocontainer">
+
+    <div class="hero">
+
+        <div class="hero-image-area">
+                    
+             <img src="{% static 'images/train_carosal.png' %}" class="hero-image-area">
+            
+        </div>
+            
+        
+
+        <div class="hero-text">
+
+            <p class="heading">Search Trains</p>
+            <p class="content">Find the best trains at best place</p>
+
+        </div>
+
+        <!-- TABS (FLOATING OVER HERO) -->
+        
+
+        <div class="search-card">
+
+            <div class="search-form">
+                <input type="text" id="source" placeholder="From" name="source">
+                <input type="text" id="destination" placeholder="To" name="destination">
+                <div class="date-input-wrapper">
+                    <input type="text" placeholder="DD/MM/YYYY" id="trainsearchdateInput" autocomplete="off" name="date">
+                    <img class="date-calender" src="{% static 'images/calendar.png' %}">
+                </div>
+                <button class="search-btn" onclick="searchTrains()">Search Train</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<div class="flight-container">
+
+    <!-- FILTER SIDEBAR -->
+    <div class="filter-sidebar">
+
+        <div class="filter-header">Filters</div>
+
+        <ul class="filter-list">
+
+
+            <li class="filter-item">
+                <div class="filter-title">
+                    Depature Time
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+                    <div class="time-box" data-slot="0-6" data-type="departure">
+                        <img src="{% static 'images/early-morning.png' %}">
+                        <span>00:00 - 06:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="6-12" data-type="departure">
+                        <img src="{% static 'images/morning.png' %}">
+                        <span>06:00 - 12:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="12-18" data-type="departure">
+                        <img src="{% static 'images/afternoon.png' %}">
+                        <span>12:00 - 18:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="18-24" data-type="departure">
+                        <img src="{% static 'images/night.png' %}">
+                        <span>18:00 - 24:00</span>
+                    </div>
+                </div>
+            </li>
+
+            
+            <li class="filter-item">
+                <div class="filter-title">
+                    Arrival Time
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+                    <div class="time-box" data-slot="0-6" data-type="arrival">
+                        <img src="{% static 'images/early-morning.png' %}">
+                        <span>00:00 - 06:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="6-12" data-type="arrival">
+                        <img src="{% static 'images/morning.png' %}">
+                        <span>06:00 - 12:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="12-18" data-type="arrival">
+                        <img src="{% static 'images/afternoon.png' %}">
+                        <span>12:00 - 18:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="18-24" data-type="arrival">
+                        <img src="{% static 'images/night.png' %}">
+                        <span>18:00 - 24:00</span>
+                    </div>
+                </div>
+            </li>
+
+            
+            
+
+            <!-- AIRLINE -->
+            <li class="filter-item">
+                <div class="filter-title">
+                    Train Type
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content" id="traintypeFilter">
+                    {% for train_type in train_types %}
+                    <label class="custom-radio">
+                        <input type="radio" name="traintype" value="{{ train_type }}">
+                        <span class="radio-circle"></span>
+                        {{ train_type }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </li>
+
+            <!-- STOP -->
+            <li class="filter-item">
+                <div class="filter-title">
+                    Travel Class
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content" id="travelclassFilter">
+                    {% for travel_class in travel_classes %}
+                    <label class="custom-radio">
+                        <input type="radio" name="travelclass" value="{{ travel_class.value }}">
+                        <span class="radio-circle"></span>
+                        {{ travel_class.label }}
+                    </label>
+                    {% endfor %}
+
+                </div>
+            </li>
+
+        </ul>
+
+    </div>
+
+
+    <div id="trainResults">
+        <!-- RESULT AREA -->
+        {% for trip in trips %}
+        <div class="flight-card">
+
+            <!-- LEFT -->
+            <div class="flight-left">
+
+                <div class="flight-top">
+                    
+                    <div>
+                        <p class="flight-name">{{trip.schedule.train.train_name}} ({{trip.schedule.train.train_number}})</p>
+                        <p>Travel Date - {{trip.travel_date}}</p>
+                    </div>
+                </div>
+
+                <!-- MIDDLE -->
+                <div class="flight-bottom">
+
+                    <div class="flight-time">
+                        <p>Boarding</p>
+                        <p class="time">{{trip.schedule.boarding_time|time:"h:i A"}}</p>
+                        <p>{{trip.schedule.boarding.name}} ({{trip.schedule.boarding.code}})</p>
+                    </div>
+
+                    <div class="flight-time">
+                        <p>Arrival</p>
+                        <p class="time">{{trip.schedule.arrival_time|time:"h:i A"}}</p>
+                        <p>{{trip.schedule.arrival.name}} ({{trip.schedule.arrival.code}})</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+            <div class="flight-right">
+                <div class="right-inner">
+                    <div class="duration-top">
+                        <img src="{% static "images/clock_icon.png" %}" alt="" class="clock-image">
+                        <span class="duration">{{trip.schedule.duration|format_duration}}</span>
+                        <p class="price">₹{{trip.starting_price}}</p>
+                    </div>
+
+                    <div class="available-seats">
+                        
+                            {% if trip.schedule.monday and trip.schedule.tuesday and trip.schedule.wednesday and trip.schedule.thursday and trip.schedule.friday and trip.schedule.saturday and trip.schedule.sunday %}
+                                Days: Daily
+                            {% else %}
+                                Days:
+                                {% if trip.schedule.monday %} M {% endif %}
+                                {% if trip.schedule.tuesday %} Tu {% endif %}
+                                {% if trip.schedule.wednesday %} W {% endif %}
+                                {% if trip.schedule.thursday %} Th {% endif %}
+                                {% if trip.schedule.friday %} F {% endif %}
+                                {% if trip.schedule.saturday %} Sa {% endif %}
+                                {% if trip.schedule.sunday %} Su {% endif %}
+                            {% endif %}
+                        
+                    </div>
+
+                    <button class="flight-right-btn" onclick="window.location.href='{% url 'train_booking:class_selection' trip.id %}'">Book Now</button>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+
+
+flatpickr("#trainsearchdateInput", {
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    defaultDate: null,
+    allowInput: true
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+
+    if (document.cookie && document.cookie !== '') {
+        let cookies = document.cookie.split(';');
+
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+
+    return cookieValue;
+}
+
+
+let searchState = {
+    source: "",
+    destination: "",
+    date: "",
+    train_types: [],
+    travel_classes: [],
+    departure_slots: [],
+    arrival_slots: []
+};
+
+
+let travelclassContainer = document.getElementById("travelclassFilter");
+let traintypeContainer = document.getElementById("traintypeFilter");
+
+
+let timer;
+
+function debounceFetch() {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+        fetchTrains();
+    }, 300); // wait 300ms
+}
+
+
+
+function fetchTrains() {
+
+    fetch("/trains/search/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify(searchState)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Server error");
+        return res.json();
+    })
+    .then(data => {
+
+        renderTrains(data.trains);
+
+
+    })
+    .catch(err => console.error(err));
+}
+
+
+
+function searchTrains() {
+    searchState.source = document.getElementById("source").value;
+    searchState.destination = document.getElementById("destination").value;
+    searchState.date = document.getElementById("trainsearchdateInput").value;
+
+    fetchTrains();
+}
+
+
+function getRunningDays(trip) {
+
+    let days = [];
+
+    if (trip.monday) days.push("M");
+    if (trip.tuesday) days.push("Tu");
+    if (trip.wednesday) days.push("W");
+    if (trip.thursday) days.push("Th");
+    if (trip.friday) days.push("F");
+    if (trip.saturday) days.push("Sa");
+    if (trip.sunday) days.push("Su");
+
+    if (days.length === 7) {
+        return "Days: Daily";
+    }
+
+    return "Days: " + days.join(" ");
+}
+
+
+
+function renderTrains(trains) {
+
+    let container = document.getElementById("trainResults");
+    container.innerHTML = "";
+
+    if (trains.length === 0) {
+        container.innerHTML = "<p>No trains found</p>";
+        return;
+    }
+
+    trains.forEach(trip => {
+
+        container.innerHTML += `
+        <div class="flight-card">
+
+        <!-- LEFT -->
+        <div class="flight-left">
+
+            <div class="flight-top">
+                <div>
+                    <p class="flight-name">${trip.train_name} (${trip.train_number})</p>
+                    <p>Travel Date - ${new Date(trip.travel_date).toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })}</p>
+                </div>
+            </div>
+
+            <!-- MIDDLE -->
+            <div class="flight-bottom">
+
+                <div class="flight-time">
+                    <p>Boarding</p>
+                    <p class="time">${trip.departure}</p>
+                    <p>${trip.source_name} (${trip.source})</p>
+                </div>
+
+                <div class="flight-time">
+                    <p>Arrival</p>
+                    <p class="time">${trip.arrival}</p>
+                    <p>${trip.destination_name} (${trip.destination})</p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="flight-right">
+            <div class="right-inner">
+
+                <div class="duration-top">
+                    <img src="/static/images/clock_icon.png" class="clock-image">
+                    <span class="duration">${trip.duration}</span>
+                    <p class="price">₹${trip.price}</p>
+                </div>
+
+                <div class="available-seats">
+                    ${getRunningDays(trip)}
+                </div>
+
+                <button class="flight-right-btn"
+                    onclick="window.location.href='/trains/class-selection/${trip.id}/'">
+                    Book Now
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+        `;
+    });
+}
+
+
+
+function renderFilters(data) {
+
+    // TRAIN TYPES
+    let typeContainer = document.getElementById("traintypeFilter");
+    typeContainer.innerHTML = "";
+
+    data.train_types.forEach(type => {
+        typeContainer.innerHTML += `
+            <label class="custom-radio">
+                <input type="radio" name="traintype" value="${type}">
+                <span class="radio-circle"></span>
+                ${type}
+            </label>
+        `;
+    });
+
+    // TRAVEL CLASSES
+    let classContainer = document.getElementById("travelclassFilter");
+    classContainer.innerHTML = "";
+
+    data.travel_classes.forEach(cls => {
+        classContainer.innerHTML += `
+            <label class="custom-radio">
+                <input type="radio" name="travelclass" value="${cls.value}">
+                <span class="radio-circle"></span>
+                ${cls.label}
+            </label>
+        `;
+    });
+}
+
+
+
+document.addEventListener("change", function(e) {
+
+    if (e.target.name === "traintype") {
+        searchState.train_types = [e.target.value];
+        fetchTrains(); // instant
+    }
+
+    if (e.target.name === "travelclass") {
+        searchState.travel_classes = [e.target.value];
+        fetchTrains();
+    }
+
+});
+
+
+
+
+
+document.querySelectorAll(".time-box").forEach(box => {
+
+    box.onclick = () => {
+
+        box.classList.toggle("active");
+
+        let slot = box.dataset.slot;
+        let type = box.dataset.type;
+
+        let targetArray = type === "arrival"
+            ? searchState.arrival_slots
+            : searchState.departure_slots;
+
+        if (box.classList.contains("active")) {
+            if (!targetArray.includes(slot)) {
+                targetArray.push(slot);
+            }
+        } else {
+            if (type === "arrival") {
+                searchState.arrival_slots =
+                    searchState.arrival_slots.filter(s => s !== slot);
+            } else {
+                searchState.departure_slots =
+                    searchState.departure_slots.filter(s => s !== slot);
+            }
+        }
+
+        fetchTrains();
+    };
+});
+
+
+document.querySelectorAll(".filter-title").forEach(title => {
+    title.addEventListener("click", () => {
+        const item = title.parentElement;
+
+        // if already open → close it
+        if(item.classList.contains("active")){
+            item.classList.remove("active");
+        } else {
+
+            // open current
+            item.classList.add("active");
+        }
+    });
+});
+
+
+
+</script>
+
+{% endblock %}

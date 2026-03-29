@@ -1,0 +1,229 @@
+/* MAIN CONTAINER */
+.login-container {
+    display: flex;
+    height: fit-content;
+    background-image: url("/static/images/about_section_bg.png");
+    padding: 40px 20px;
+}
+
+/* LEFT SECTION */
+.left-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.left-section img {
+    width: 70%;
+}
+
+/* RIGHT SECTION */
+.right-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* LOGIN BOX */
+.login-box {
+    background: var(--white); /* glass effect */
+    padding: 40px;
+    width: 500px;
+    height: auto;
+    border-radius: 16px;
+}
+
+/* Heading */
+.login-box .heading {
+    font-size: 28px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.login-box .sub-heading {
+    font-size: 14px;
+    color: var(--black);
+    margin-bottom: 35px;
+    text-align: center;
+}
+
+/* INPUT */
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 20px 20px 20px 50px;
+    border-radius: 10px;
+    border: 1px solid var(--grey);
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    outline-color: var(--dark-grey);
+}
+
+input:focus::placeholder {
+    color: transparent;
+}
+
+/* OPTIONS */
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: clamp(13px, 2vw, 15px);
+    margin-top: 40px;
+    margin-bottom: 25px;
+}
+
+.custom-checkbox input {
+    display: none;
+}
+
+/* LABEL STYLE */
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    gap: 8px;
+}
+
+/* BOX */
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--grey);
+    border-radius: 4px;
+    display: inline-block;
+    position: relative;
+    transition: 0.3s;
+}
+
+/* WHEN CHECKED */
+.custom-checkbox input:checked + .checkmark {
+    background: var(--red); 
+    border-color: var(--red);
+}
+
+/* WHITE TICK */
+.checkmark::after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* SHOW TICK */
+.custom-checkbox input:checked + .checkmark::after {
+    display: block;
+}
+
+/* TICK DESIGN */
+.checkmark::after {
+    left: 6px;
+    top: 0px;
+    width: 4px;
+    height: 10px;
+    border: solid var(--white);
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+.checkmark-text
+{
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+
+.options a {
+    color: var(--red);
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+
+.btn-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+/* BUTTON */
+.login-button {
+    width: 45%;
+    padding: 13px ;
+    background: var(--greenish-blue);
+    color: var(--white);
+    border: none;
+    border-radius: 30px;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.login-button:hover {
+    background-color: var(--black);
+}
+
+/* SIGNUP */
+.signup-text {
+    text-align: center;
+    margin: 20px 0px;
+    font-size: 15px;
+
+}
+
+.signup-text a {
+    color: var(--red);
+    text-decoration: none;
+    margin-left: 20px;
+    
+}
+
+.login-disclaimer{
+    margin: 20px 0px 0px 0px;
+    font-size: 11px;
+    text-align: center;
+    color: var(--dark-grey);
+}
+
+/* 🔥 RESPONSIVE */
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .left-section {
+         display: none;
+    }
+
+    .right-section {
+        flex: 1;
+        width: 100%;
+        padding: 20px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-box {
+        width: 100%;
+        max-width: 400px;
+        margin: auto;
+    }
+}

@@ -1,0 +1,101 @@
+{% extends 'booking_app/base.html' %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Train Selection</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/train_class_selection.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="container">
+
+    <!-- 🚆 HEADER -->
+    <div class="train-header">
+        <h2>{{ trip.schedule.boarding.name }} ({{ trip.schedule.boarding.code }}) → {{ trip.schedule.arrival.name }} ({{ trip.schedule.arrival.code }})</h2>
+        <p>{{ trip.schedule.train.train_name }} ({{ trip.schedule.train.train_number }}) • {{ trip.travel_date }}</p>
+    </div>
+
+
+    <!-- 🪑 CLASS CARDS -->
+    <div class="class-wrapper">
+
+        {% for cls in class_data %}
+        <div class="class-card {% if cls.available_seats == 0 %}disabled{% endif %}"
+            onclick="selectClass('{{ trip.id }}','{{ cls.code }}')">
+
+            <div class="class-header">
+                <h3>{{ cls.code }}</h3>
+                <span class="price">₹{{ cls.price }}</span>
+            </div>
+
+            {% if cls.available_seats > 0 %}
+                <p class="available">
+                    {{ cls.available_seats }} Seats Left
+                </p>
+            {% else %}
+                <p class="waiting">Not Available</p>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+function selectClass(tripId, coachType){
+
+    fetch(`/trains/initiate-booking/${tripId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({
+            coach_type: coachType,
+            
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            window.location.href = data.redirect_url;
+        } else {
+            window.location.href = `/trains/class-selection/${tripId}/`;
+        }
+    });
+}
+
+
+
+</script>
+
+{% endblock %}

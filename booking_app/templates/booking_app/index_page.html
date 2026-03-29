@@ -1,0 +1,674 @@
+{% extends 'booking_app/base.html' %}
+{% load static %}
+
+{% block title %}<title>TravelVerse</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/index_page.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<!-- HERO -->
+<section class="herocontainer">
+
+    <div class="hero">
+
+        <div class="carousel">
+
+            <div class="carousel-track">
+
+                <div class="carousel-card">
+                    
+                    <img src="{% static 'images/flight_carosal.png' %}" class="avatar">
+                    
+                </div>
+
+                <div class="carousel-card">
+                    
+                    <img src="{% static 'images/train_carosal.png' %}" class="avatar">
+                    
+                </div>
+
+                <div class="carousel-card">
+                    
+                    <img src="{% static 'images/bus_carosal.png' %}" class="avatar">
+                    
+                </div>
+
+                <div class="carousel-card">
+                    
+                    <img src="{% static 'images/movie_carosal.png' %}" class="avatar">
+                    
+                </div>
+
+                <div class="carousel-card">
+                    
+                    <img src="{% static 'images/event_carosal.png' %}" class="avatar">
+                    
+                </div>
+
+                <div class="carousel-card">
+                    
+                    <img src="{% static 'images/sport_carosal.png' %}" class="avatar">
+                    
+                </div>
+
+                <div class="carousel-card">
+                    
+                    <img src="{% static 'images/activity_carosal.png' %}" class="avatar">
+                    
+                </div>
+
+                <div class="carousel-card">
+                    
+                    <img src="{% static 'images/hotel_carosal.jpg' %}" class="avatar">
+                    
+                </div>
+
+            </div>
+
+        </div>
+            
+        <!-- Buttons BELOW carousel -->
+        <div class="carousel-controls">
+            <button class="nav-btn prev">&#10094;</button>
+            <button class="nav-btn next">&#10095;</button>
+        </div>
+
+        <div class="hero-text">
+
+            <p class="heading">Book Everything, Everywhere</p>
+            <p class="content">From flights to movies, events to experiences - all in one place</p>
+
+        </div>
+
+        <!-- TABS (FLOATING OVER HERO) -->
+        <div class="hero-tabs">
+            <button class="tab active" data-type="flight"><img src="{% static 'images/flight_icon.png' %}"><span>Flights</span></button>
+            <button class="tab" data-type="train"><img src="{% static 'images/train_icon.png' %}"><span>Train</span> </button>
+            <button class="tab" data-type="bus"><img src="{% static 'images/bus_icon.png' %}"><span>Bus</span></button>
+            <button class="tab" data-type="movie"><img src="{% static 'images/movie_icon.png' %}"><span>Movies</span></button>
+            <button class="tab" data-type="event"><img src="{% static 'images/event_icon.png' %}"><span>Events</span></button>
+        </div>
+
+        <div class="search-card">
+
+            <div class="search-form">
+                <input type="text" placeholder="From">
+                <input type="text" placeholder="To">
+                <div class="date-input-wrapper">
+                    <input type="text" placeholder="DD/MM/YYYY" id="dateInput">
+                    <img class="date-calender" src="{% static 'images/calendar.png' %}">
+                </div>
+                <button class="search-btn">Search Flight</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="category-section">
+
+    <h2>What would you like to book?</h2>
+    <p>Choose from our wide range of services</p>
+
+    <div class="category-grid">
+
+        <a href="{% url "flight_booking:flights_display" %}">
+            <div class="card">
+                <img src="{% static 'images/flight_category.png' %}">
+                <div class="overlay">
+                    <img src="{% static 'images/flight_icon.png' %}">
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'train_booking:train_display' %}">
+            <div class="card">
+                <img src="{% static 'images/train_category.png' %}">
+                <div class="overlay">
+                    <img src="{% static 'images/train_icon.png' %}">
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'bus_booking:bus_display' %}">
+            <div class="card">
+                <img src="{% static 'images/bus_category.png' %}">
+                <div class="overlay">
+                    <img src="{% static 'images/bus_icon.png' %}">
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'movie_booking:movie_display' %}">
+            <div class="card">
+                <img src="{% static 'images/movie_category.png' %}">
+                <div class="overlay">
+                    <img src="{% static 'images/movie_icon.png' %}">
+                </div>
+            </div>
+        </a>
+
+        <a href="">
+            <div class="card">
+                <img src="{% static 'images/event_category.png' %}">
+                <div class="overlay">
+                    <img src="{% static 'images/event_icon.png' %}">
+                </div>
+            </div>
+        </a>
+
+        <a href="">
+            <div class="card">
+                <img src="{% static 'images/sport_category.png' %}">
+                <div class="overlay">
+                    <img src="{% static 'images/sport_icon.png' %}">
+                </div>
+            </div>
+        </a>
+
+        <a href="">
+            <div class="card">
+                <img src="{% static 'images/activity_category.png' %}">
+                <div class="overlay">
+                    <img src="{% static 'images/activity_icon.png' %}">
+                </div>
+            </div>
+        </a>
+
+        <a href="">
+            <div class="card">
+                <img src="{% static 'images/hotel_category.png' %}">
+                <div class="overlay">
+                    <img src="{% static 'images/hotel_icon.png' %}">
+                </div>
+            </div>
+        </a>
+
+    </div>
+
+</section>
+
+<section class="about-trending">
+
+    <!-- ABOUT SECTION -->
+    <div class="about-container">
+
+        <div class="about-left">
+            <img src="{% static 'images/about_section_image.png' %}">
+        </div>
+
+        <div class="about-right">
+
+            <p class="about-title">About TicketVerse</p>
+
+            <p class="about-tag">
+                Your All-in-One Platform for Travel,
+                Events,<br> and Experiences
+            </p>
+
+            <p class="about-desc">
+                TicketVerse makes booking easy by bringing flights, trains, buses,
+                hotels, movies, events, sports, and activities into one platform.
+            </p>
+
+            <div class="about-features">
+                <span><img src="{% static 'images/green_tick.png' %}"> Easy Booking</span>
+                <span><img src="{% static 'images/green_tick.png' %}"> Secure Payments</span>
+                <span><img src="{% static 'images/green_tick.png' %}"> Wide Selection</span>
+                <span><img src="{% static 'images/green_tick.png' %}"> Instant Confirmation</span>
+            </div>
+
+            <button class="about-btn">About</button>
+
+        </div>
+
+    </div>
+
+
+    <!-- TRENDING SECTION -->
+    <div class="trending">
+
+        <p class="trending-title">Trending Experiences</p>
+        <p class="trending-content">Discover the most popular destinations and events people are bookings right now</p>
+
+        <div class="about-carousel">
+            <div class="about-carousel-track" id="track">
+
+                <!-- CARD 1 -->
+                <div class="about-carousel-card">
+                    <img src="{% static 'images/trend_goa.png' %}">
+                    <!-- TOP INFO -->
+                    <div class="card-top">
+                        <span>📅 23/03/2026</span>
+                        <div class="stars">★★★★★</div>
+                    </div>
+                    <!-- CATEGORY -->
+                    <div class="card-category">
+                        Activity | 3 Days Package
+                    </div>
+
+                    <h4>Goa Adventure Trip</h4>
+                    <hr>
+
+                    <!-- PRICE + BUTTON -->
+                    <div class="card-bottom">
+                        <span class="price">₹8,500</span>
+                        <button class="book-btn">Book Now</button>
+                    </div>
+                </div>
+
+                <!-- CARD 2 -->
+                <div class="about-carousel-card">
+                    <img src="{% static 'images/trend_flight.png' %}">
+                    <!-- TOP INFO -->
+                    <div class="card-top">
+                        <span>📅 23/03/2026</span>
+                        <div class="stars">★★★★★</div>
+                    </div>
+                    <!-- CATEGORY -->
+                    <div class="card-category">
+                        Activity | 3 Days Package
+                    </div>
+                    <h4>Chennai → Bangalore</h4>
+                    <hr>
+
+                    <!-- PRICE + BUTTON -->
+                    <div class="card-bottom">
+                        <span class="price">₹8,500</span>
+                        <button class="book-btn">Book Now</button>
+                    </div>
+                </div>
+
+                <!-- CARD 3 -->
+                <div class="about-carousel-card">
+                    <img src="{% static 'images/trend_ipl.png' %}">
+
+                    <!-- TOP INFO -->
+                    <div class="card-top">
+                        <span>📅 23/03/2026</span>
+                        <div class="stars">★★★★★</div>
+                    </div>
+                    <!-- CATEGORY -->
+                    <div class="card-category">
+                        Activity | 3 Days Package
+                    </div>
+                    <h4>IPL Match</h4>
+                    <hr>
+
+                    <!-- PRICE + BUTTON -->
+                    <div class="card-bottom">
+                        <span class="price">₹8,500</span>
+                        <button class="book-btn">Book Now</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="trending-dest">
+
+    <p class="trending-dest-heading">Trending Destinations</p>
+
+    <div class="trentdestcarosle">
+        <div class="trentdest-track" id="trentTrack">
+
+            <!-- CARD -->
+            <div class="trent-card">
+                <div class="image-box">
+                    <img src="{% static 'images/trent_des1.jpg' %}">
+                    <div class="badge"><img src="{% static 'images/fire icon.png' %}" alt=""><span>Hot</span></div>
+                </div>
+
+                <div class="content">
+                    <div class="top-row">
+                        <h3>Bali, Indonesia</h3>
+                        <span class="rating">⭐ 4.3</span>
+                    </div>
+
+                    <p class="location">📍 Beach Paradise</p>
+
+                    <div class="bottom-row">
+                        <span class="price">₹4,500</span>
+                        <button>Book Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COPY SAME CARD 3-5 TIMES -->
+            
+            <div class="trent-card">
+                <div class="image-box">
+                    <img src="{% static 'images/trent_des2.jpg' %}">
+                    <div class="badge"><img src="{% static 'images/fire icon.png' %}" alt=""><span>Hot</span></div>
+                </div>
+
+                <div class="content">
+                    <div class="top-row">
+                        <h3>Tokyo, Japan</h3>
+                        <span class="rating">⭐ 4.3</span>
+                    </div>
+
+                    <p class="location">📍 City Adventure</p>
+
+                    <div class="bottom-row">
+                        <span class="price">₹4,500</span>
+                        <button>Book Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="trent-card">
+                <div class="image-box">
+                    <img src="{% static 'images/trent_des3.jpg' %}">
+                    <div class="badge"><img src="{% static 'images/fire icon.png' %}" alt=""><span>Hot</span></div>
+                </div>
+
+                <div class="content">
+                    <div class="top-row">
+                        <h3>Swiss Alps</h3>
+                        <span class="rating">⭐ 4.3</span>
+                    </div>
+
+                    <p class="location">📍 Mountain Escape</p>
+
+                    <div class="bottom-row">
+                        <span class="price">₹4,500</span>
+                        <button>Book Now</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+
+<section class="popular-section">
+
+    <p class="popular-sec-title">Popular Events & Movies</p>
+
+    <div class="popularcarosel">
+        <div class="popular-track" id="popularTrack">
+
+            <!-- CARD -->
+            <div class="popular-card">
+                <img src="{% static 'images/movie_popular.jpg' %}">
+
+                <div class="popular-overlay">
+                    <span class="rating">⭐ 4.3</span>
+                    <p class="popular-title">Epic Adventure</p>
+                    <p class="popular-detail">Movie | Adventure | 12/03/2026 | 6:30 PM</p>
+                </div>
+            </div>
+
+            <div class="popular-card">
+                <img src="{% static 'images/event_popular.webp' %}">
+
+                <div class="popular-overlay">
+                    <span class="rating">⭐ 4.3</span>
+                    <p class="popular-title">Music Festival Live</p>
+                    <p class="popular-detail">Concert | 12/03/2026 | 6:30 PM</p>
+                </div>
+            </div>
+
+            <div class="popular-card">
+                <img src="{% static 'images/sport_popular.webp' %}">
+
+                <div class="popular-overlay">
+                    <span class="rating">⭐ 4.3</span>
+                    <p class="popular-title">Championship Finals</p>
+                    <p class="popular-detail">Sports | 12/03/2026 | 6:30 PM</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+
+
+<section class="cta-section">
+    <div class="cta-overlay">
+
+        <h2>Ready to Book Your Next Experience?</h2>
+
+        <p>
+            Discover flights, sports events, movies, concerts, and activities —
+            all in one place with TicketVerse.
+        </p>
+
+        <div class="cta-buttons">
+            <button class="btn-primary">Find Tickets</button>
+            <button class="btn-secondary">Explore Categories</button>
+        </div>
+
+    </div>
+</section>
+
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+const track = document.querySelector(".carousel-track");
+const slides = document.querySelectorAll(".carousel-card");
+
+const prevBtn = document.querySelector(".prev");
+const nextBtn = document.querySelector(".next");
+
+let index = 0;
+const totalSlides = slides.length;
+
+function updateCarousel(){
+track.style.transform = `translateX(-${index * 100}%)`;
+}
+
+nextBtn.addEventListener("click", function(){
+index++;
+if(index >= totalSlides){
+index = 0;
+}
+updateCarousel();
+});
+
+prevBtn.addEventListener("click", function(){
+index--;
+if(index < 0){
+index = totalSlides - 1;
+}
+updateCarousel();
+});
+
+setInterval(function(){
+index++;
+if(index >= totalSlides){
+index = 0;
+}
+updateCarousel();
+}, 4000);
+
+});
+
+
+const track = document.getElementById("track");
+const cards = track.querySelectorAll(".about-carousel-card");
+
+let index = 0;
+let interval;
+let cardWidth;
+
+// Clone cards for infinite loop
+cards.forEach(card => {
+    const clone = card.cloneNode(true);
+    track.appendChild(clone);
+});
+
+function updateWidth() {
+    const card = document.querySelector(".about-carousel-card");
+    const gap = 20;
+    cardWidth = card.offsetWidth + gap;
+}
+
+function moveCarousel() {
+    index++;
+    track.style.transform = `translateX(-${index * cardWidth}px)`;
+
+    if (index >= cards.length) {
+        setTimeout(() => {
+            track.style.transition = "none";
+            index = 0;
+            track.style.transform = `translateX(0px)`;
+        }, 500);
+
+        setTimeout(() => {
+            track.style.transition = "transform 0.5s ease";
+        }, 600);
+    }
+}
+
+function startCarousel() {
+    interval = setInterval(moveCarousel, 3000);
+}
+
+function stopCarousel() {
+    clearInterval(interval);
+}
+
+// Pause on hover
+track.addEventListener("mouseenter", stopCarousel);
+track.addEventListener("mouseleave", startCarousel);
+
+// Recalculate on resize
+window.addEventListener("resize", updateWidth);
+
+// Init
+updateWidth();
+startCarousel();
+
+
+
+const trentTrack = document.getElementById("trentTrack");
+const trentCards = trentTrack.querySelectorAll(".trent-card");
+
+let trentIndex = 0;
+let trentWidth;
+let trentInterval;
+
+// clone for infinite loop
+trentCards.forEach(card => {
+    trentTrack.appendChild(card.cloneNode(true));
+});
+
+function updateTrentWidth() {
+    const card = document.querySelector(".trent-card");
+    trentWidth = card.offsetWidth + 20;
+}
+
+function moveTrent() {
+    trentIndex++;
+    trentTrack.style.transform = `translateX(-${trentIndex * trentWidth}px)`;
+
+    if (trentIndex >= trentCards.length) {
+        setTimeout(() => {
+            trentTrack.style.transition = "none";
+            trentIndex = 0;
+            trentTrack.style.transform = `translateX(0px)`;
+        }, 500);
+
+        setTimeout(() => {
+            trentTrack.style.transition = "transform 0.5s ease";
+        }, 600);
+    }
+}
+
+function startTrent() {
+    trentInterval = setInterval(moveTrent, 3000);
+}
+
+function stopTrent() {
+    clearInterval(trentInterval);
+}
+
+trentTrack.addEventListener("mouseenter", stopTrent);
+trentTrack.addEventListener("mouseleave", startTrent);
+
+window.addEventListener("resize", updateTrentWidth);
+
+updateTrentWidth();
+startTrent();
+
+
+
+
+
+const popularTrack = document.getElementById("popularTrack");
+const popularCards = popularTrack.querySelectorAll(".popular-card");
+
+let popularIndex = 0;
+let popularWidth;
+let popularInterval;
+
+// clone for infinite loop
+popularCards.forEach(card => {
+    popularTrack.appendChild(card.cloneNode(true));
+});
+
+function updatePopularWidth() {
+    const card = document.querySelector(".popular-card");
+    popularWidth = card.offsetWidth + 20;
+}
+
+function movePopular() {
+    popularIndex++;
+    popularTrack.style.transform = `translateX(-${popularIndex * popularWidth}px)`;
+
+    if (popularIndex >= popularCards.length) {
+        setTimeout(() => {
+            popularTrack.style.transition = "none";
+            popularIndex = 0;
+            popularTrack.style.transform = `translateX(0px)`;
+        }, 500);
+
+        setTimeout(() => {
+            popularTrack.style.transition = "transform 0.5s ease";
+        }, 600);
+    }
+}
+
+function startPopular() {
+    popularInterval = setInterval(movePopular, 3000);
+}
+
+function stopPopular() {
+    clearInterval(popularInterval);
+}
+
+popularTrack.addEventListener("mouseenter", stopPopular);
+popularTrack.addEventListener("mouseleave", startPopular);
+
+window.addEventListener("resize", updatePopularWidth);
+
+updatePopularWidth();
+startPopular();
+
+</script>
+
+{% endblock %}
+
+

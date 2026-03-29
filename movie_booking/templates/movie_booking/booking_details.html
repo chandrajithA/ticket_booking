@@ -1,0 +1,342 @@
+{% extends 'booking_app/base.html' %}
+{% load time_filters %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Flight Passenger Details</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/movie_booking_details.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+
+
+<div class="passenger-container">
+
+    <!-- LEFT SIDE -->
+    
+
+
+    <!-- RIGHT SIDE -->
+    <div class="right-card">
+        <div class="card-header">Booking Info</div>
+
+        <!-- FLIGHT TOP -->
+        <!-- TOP -->
+        <div class="top-row">
+            <span>Time Left:</span><div id="timer" style="font-size:18px; color:red;"></div>
+            <button id="cancelBookingBtn" class="booking-cancel-btn">Cancel Booking</button>
+        </div>
+
+        <hr>
+
+        <div class="top-row">
+            <img src="{{ booking.show.movie.poster.url }}" class="logo">
+            <div class="airline-name">
+                {{ booking.show.movie.title }} <p style="display:block;">{{ booking.show.movie.language }} - {{ booking.show.movie.genre }} ({{ booking.show.movie.format }})</p>
+            </div>
+            
+        </div>
+
+        <hr>
+
+        <!-- FLIGHT INFO -->
+        <div class="info-row">
+            <div>
+                <p class="value">Theatre Name: {{ booking.show.screen.theatre.name }}</p>
+            </div>
+
+            <div class="right">
+                <img src="{% static 'images/clock_icon.png' %}" class="clock">
+                <span class="value">{{ booking.show.movie.duration|format_duration }}</span>
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div>
+                <p class="value">Address: {{ booking.show.screen.theatre.address }}, {{ booking.show.screen.theatre.city.name }}</p>
+            </div>
+
+            <div class="right">
+                <p class="value">Screen: {{ booking.show.screen.name }}</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <p class="label">Date : {{ booking.show.show_date }}</p>
+
+        <!-- ROUTE -->
+        <div class="route">
+
+            <div class="col">
+                <p class="label">Show Timing - {{ booking.show.show_time|time:"h:i A" }}</p>
+                <p class="value">{{ booking.show.screen.name }}</p>
+            </div>
+
+        </div>
+
+        <hr>
+
+        <!-- DISCOUNT -->
+        <div class="section">
+            <p class="section-title">Discount Option</p>
+
+            <div class="coupon">
+                <span class="gear">⚙</span>
+                <input type="text" placeholder="Enter Code">
+                <button><span>→</span></button>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- FARE -->
+        <div class="section">
+            <p class="section-title">Fare Details</p>
+
+            <div class="fare-row">
+                <span>Ticket Price</span>
+                <span>₹<span id="ticketPrice">{{ total_ticket_price }}</span></span>
+            </div>
+
+            <div class="fare-row">
+                <span>Service Charges</span>
+                <span>₹<span id="serviceChargePrice">0</span></span>
+            </div>
+
+            <div class="fare-row">
+                <span>Tax (5%) </span>
+                <span>₹<span id="taxPrice">0</span></span>
+            </div>
+
+            <div class="fare-row total">
+                <span>Total Price</span>
+                <span>₹<span id="totalPrice">{{ total_ticket_price }}</span></span>
+            </div>
+        </div>
+
+        <!-- BUTTON -->
+        <div class="pay-btn-wrapper">
+            <button class="pay-btn" onclick="startPayment()">Continue Payment</button>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+
+
+const totalViewers = parseInt("{{ total_viewers }}");
+let baseTicketPrice = parseFloat("{{ total_ticket_price }}");
+let taxPercent = 5;
+
+
+
+// CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie) {
+        document.cookie.split(';').forEach(cookie => {
+            if (cookie.trim().startsWith(name + '=')) {
+                cookieValue = cookie.split('=')[1];
+            }
+        });
+    }
+    return cookieValue;
+}
+
+
+
+function updatePriceUI() {
+
+    let servicecharge = totalViewers * {{service_charge}};
+    let subtotal = baseTicketPrice + servicecharge;
+    let tax = (subtotal * taxPercent) / 100;
+    let total = subtotal + tax;
+
+    document.querySelector("#taxPrice").innerText = tax.toFixed(2);
+    document.querySelector("#totalPrice").innerText = total.toFixed(2);
+    document.querySelector("#serviceChargePrice").innerText = servicecharge.toFixed(2);
+}
+
+
+
+
+
+
+function cancelBooking() {
+    return fetch("/movies/cancel-booking/{{ booking.id }}/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    }).then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'movie_booking:payment_failed' booking.id %}";
+        }
+        else {
+            window.location.href = "{% url 'movie_booking:seat_selection' booking.show.id %}";
+        }
+    });
+}
+
+
+
+
+
+function expireBooking() {
+    return fetch("/movies/expire-booking/{{ booking.id }}/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    }).then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'movie_booking:seat_selection' booking.show.id %}";
+        }
+        else {
+            window.location.href = "{% url 'movie_booking:seat_selection' booking.show.id %}";
+        }
+    });
+}
+
+
+
+
+const expiryTime = {{ expiry_time|safe }} * 1000; // convert to ms
+const timerEl = document.getElementById("timer");
+
+const interval = setInterval(() => {
+
+    const now = new Date().getTime();
+    const distance = expiryTime - now;
+
+    if (distance <= 0) {
+
+        clearInterval(interval);
+        timerEl.innerHTML = "Time Out";
+
+        console.log("Timer Out → Booking Cancelled");
+
+        expireBooking();
+
+        return;
+    }
+
+    const minutes = Math.floor(distance / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    timerEl.innerHTML = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+}, 1000);
+
+
+
+
+
+function startPayment() {
+
+
+    fetch("{% url 'movie_booking:create_payment_order' booking.id %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (!data.success) {
+            alert("Unable to start payment");
+            return;
+        }
+
+        openRazorpay(data);
+    });
+}
+
+
+function openRazorpay(data) {
+
+    var options = {
+        "key": data.key,
+        "amount": data.amount,
+        "currency": "INR",
+        "name": "TravelVerse",
+        "description": "Movie Booking",
+        "order_id": data.order_id,
+
+        "handler": function (response) {
+            verifyPayment(response);
+        },
+
+        "modal": {
+            "ondismiss": function () {
+                
+                    cancelBooking();
+                  
+            }
+        }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+}
+
+
+
+
+
+function verifyPayment(response) {
+
+    fetch("{% url 'movie_booking:verify_payment' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify(response)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'movie_booking:payment_success' booking.id %}";
+        } else {
+            cancelBooking();
+        }
+    })
+    .catch(() => {
+        cancelBooking();
+    });
+}
+
+
+document.getElementById("cancelBookingBtn").addEventListener("click", function () {
+
+    if (!confirm("Are you sure you want to cancel booking?")) return;
+
+    cancelBooking()
+
+});
+
+
+updatePriceUI();
+
+
+</script>
+
+{% endblock %}

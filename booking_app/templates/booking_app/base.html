@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/company_logo.png' %}">
+    {% block title %} {% endblock %}
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block style %} {% endblock %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+
+  <div class="top-container">
+
+    <div class="top-left">
+
+        <div class="top-left-mail">
+            <img src="{% static 'images/gmail-pic.png' %}" class="icon">
+            <span>info@ticketverse.com</span>
+        </div>
+      
+        <div class="top-left-phone">
+            <img src="{% static 'images/phone-pic.png' %}" class="icon">
+            <span>+91-1234567890</span>
+        </div>
+      
+    </div>
+
+    <div class="top-right">
+
+        <a href="{% url "booking_app:index_page" %}">
+            <div class="top-right-home">
+                <img src="{% static 'images/home_icon.png' %}" class="social">
+                <span>Home</span>
+            </div>
+        </a>
+        
+
+        <a href="#">
+            <div class="top-right-contact">
+                
+                    <img src="{% static 'images/contact_icon.png' %}" class="social">
+                    <span>Contact</span>
+                
+            </div>
+        </a>
+        
+        <div class="top-right-social">
+            <img src="{% static 'images/facebook_icon.png' %}" class="social">
+            <img src="{% static 'images/insta_icon.png' %}" class="social">
+            <img src="{% static 'images/youtube_icon.png' %}" class="social">
+            <img src="{% static 'images/twitter_icon.png' %}" class="social">
+        </div>
+        
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<!-- NAVBAR -->
+<div class="navbar">
+    
+  <div class="nav-container">
+
+    {% if messages %}
+        <div class="toast-container">
+            {% for message in messages %}
+            <div class="toast {{ message.tags }}">
+                <span>{{ message }}</span>
+                <button onclick="closeToast(this)">×</button>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="logo">
+        <img src="{% static 'images/company_logo.png' %}" class="social">
+    </div>
+
+    <ul class="nav-menu">
+
+        <a href="{% url "flight_booking:flights_display" %}" class="{% if request.resolver_match.app_name == 'flight_booking' %}active{% endif %}"><li><img src="{% static 'images/flight_icon.png' %}"> <span>Flights</span> </li></a>
+        <a href="{% url 'train_booking:train_display' %}" class="{% if request.resolver_match.app_name == 'train_booking' %}active{% endif %}"><li><img src="{% static 'images/train_icon.png' %}"> <span>Train</span> </li></a>
+        <a href="{% url 'bus_booking:bus_display' %}" class="{% if request.resolver_match.app_name == 'bus_booking' %}active{% endif %}"><li><img src="{% static 'images/bus_icon.png' %}"> <span>Bus</span> </li></a>
+        <a href="{% url 'movie_booking:movie_display' %}" class="{% if request.resolver_match.app_name == 'movie_booking' %}active{% endif %}"><li><img src="{% static 'images/movie_icon.png' %}"> <span>Movies</span> </li></a>
+        <a href=""><li><img src="{% static 'images/event_icon.png' %}"> <span>Events</span> </li></a>
+        <a href=""><li><img src="{% static 'images/sport_icon.png' %}"> <span>Sports</span> </li></a>
+        <a href=""><li><img src="{% static 'images/activity_icon.png' %}"> <span>Activities</span> </li></a>
+        <a href=""><li><img src="{% static 'images/hotel_icon.png' %}"> <span>Hotels</span> </li></a>
+        {% if user.is_authenticated %}
+        <a href=""><li><span>My Bookings</span></li></a>
+        {% endif %}
+
+    </ul>
+
+    {% if user.is_authenticated %}
+        <a href="{% url 'accounts:user_logout' %}" class="login-btn">Logout</a>
+    {% else %}
+        <a href="{% url 'accounts:login_page' %}" class="login-btn">Login / Signup</a>
+    {% endif %}
+
+  </div>
+
+</div>
+
+
+
+{% block content %}
+{% endblock %}
+
+
+
+<footer class="footer">
+
+    <div class="footer-container">
+
+        <!-- LEFT -->
+        <div class="footer-left">
+            <img src="{% static 'images/company_logo.png' %}" alt="" class="footer-logo">
+
+            <p>
+                Your one-stop platform for booking flights, trains, buses, movies,
+                events, sports tickets, and amazing experiences.
+            </p>
+        </div>
+
+        <!-- QUICK LINKS -->
+        <div class="footer-col">
+            <p class="footer-heading">Quick Links</p>
+            <a href="#">Book Flights</a>
+            <a href="#">Book Trains</a>
+            <a href="#">Book Buses</a>
+            <a href="#">Movie Tickets</a>
+            <a href="#">Events</a>
+        </div>
+
+        <!-- SUPPORT -->
+        <div class="footer-col">
+            <p class="footer-heading">Support</p>
+            <a href="#">Help Center</a>
+            <a href="#">Terms of Services</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Cancellation Policy</a>
+            <a href="#">Contact Us</a>
+        </div>
+
+        <!-- CONTACT -->
+        <div class="footer-col">
+            <p class="footer-heading">Contact</p>
+            <p class="footer-content"><img src="{% static 'images/phone_icon.png' %}" alt=""> +91-1234567890</p>
+            <p class="footer-content"><img src="{% static 'images/email_icon.png' %}" alt=""> info@ticketverse.com</p>
+            <p class="footer-content"><img src="{% static 'images/location_icon.png' %}" alt=""> 123 Booking Street, San Francisco</p>
+        </div>
+
+    </div>
+
+</footer>
+
+</body>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+
+    function closeToast(btn) {
+    const toast = btn.parentElement;
+    toast.style.opacity = "0";
+    toast.style.transform = "translateX(60px)";
+    setTimeout(() => toast.remove(), 300);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const toasts = document.querySelectorAll(".toast");
+
+    toasts.forEach((toast, index) => {
+        setTimeout(() => {
+            toast.style.opacity = "0";
+            toast.style.transform = "translateX(60px)";
+            setTimeout(() => toast.remove(), 300);
+        }, 5000 + index * 300);
+    });
+});
+
+</script>
+
+{% block script %}
+{% endblock %}
+
+
+
+</html>

@@ -1,0 +1,223 @@
+{% extends 'booking_app/base.html' %}
+{% load time_filters %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Movie Shows</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/movie_show_selection.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<div id="cityModal" class="city-modal">
+    <div class="city-box">
+        <h2>Select City</h2>
+
+        <select id="citySelect">
+            <option value="">Select City</option>
+            {% for c in cities %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+            {% endfor %}
+        </select>
+
+        <button onclick="confirmCity()">Continue</button>
+    </div>
+</div>
+
+
+
+
+<div class="movie-header">
+
+    <div class="movie-poster">
+        <img src="{{ movie.poster.url }}" alt="{{ movie.title }}">
+    </div>
+
+    <div class="movie-info">
+        <h1 class="movie-title">{{ movie.title }}</h1>
+
+        <div class="movie-meta">
+            <span>{{ movie.language }}</span>
+            <span>•</span>
+            <span>{{ movie.duration }} mins</span>
+            <span>•</span>
+            <span>{{ movie.genre }}</span>
+        </div>
+
+        
+        <div class="top-city">
+            <span>Choose City: </span>
+            <select id="citySwitcher" onchange="changeCity(this)">
+                <option value="">Select City</option>
+                {% for c in cities %}
+                    <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="showdisplayarea">
+    <div id="dateContainer" class="date-bar"></div>
+
+
+    <div id="theatreContainer"></div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+
+
+<script>
+let selectedCity = null;
+const movieId = "{{ movie.id }}";
+const movieName = "{{ movie.title }}";
+
+// 👉 Show modal on load
+window.onload = function () {
+    document.getElementById("cityModal").style.display = "flex";
+};
+
+// 👉 First time selection
+function confirmCity() {
+    let dropdown = document.getElementById("citySelect");
+    let cityId = dropdown.value;
+
+    if (!cityId) {
+        alert("Select a city");
+        return;
+    }
+
+    selectedCity = cityId;
+
+    // Set top dropdown value
+    document.getElementById("citySwitcher").value = cityId;
+
+    // Close modal
+    document.getElementById("cityModal").style.display = "none";
+
+    loadDates();
+}
+
+// 👉 Change city from top dropdown
+function changeCity(el) {
+    let newCity = el.value;
+
+    if (!newCity) return;
+
+    // ❌ Prevent duplicate call
+    if (selectedCity === newCity) return;
+
+    selectedCity = newCity;
+
+    // Clear old UI
+    document.getElementById("dateContainer").innerHTML = "";
+    document.getElementById("theatreContainer").innerHTML = "";
+
+    // Reload data
+    loadDates();
+}
+
+
+// Load Dates
+function loadDates() {
+    fetch(`/movies/get-dates/?movie_id=${movieId}&city_id=${selectedCity}`)
+    .then(res => res.json())
+    .then(data => {
+
+        let container = document.getElementById("dateContainer");
+        let theatreContainer = document.getElementById("theatreContainer");
+
+        container.innerHTML = "";
+        theatreContainer.innerHTML = "";
+
+        // ❌ No shows case
+        if (data.dates.length === 0) {
+            container.innerHTML = "";
+            theatreContainer.innerHTML = `
+                <div class="no-shows">
+                    No shows available for <b>${movieName}</b> in this city
+                </div>
+            `;
+            return;
+        }
+
+        data.dates.forEach(date => {
+            let d = new Date(date);
+
+            let day = d.toLocaleDateString("en-IN", { weekday: "short" });
+            let dayNum = d.getDate();
+            let month = d.toLocaleDateString("en-IN", { month: "short" });
+            let year = d.getFullYear().toString().slice(-2);
+
+            let div = document.createElement("div");
+            div.className = "date-item";
+
+            div.innerHTML = `
+                
+                <div>${day}</div>
+                <div>${dayNum}</div>
+                <div>${month}</div>
+            `;
+
+            div.onclick = () => {
+                document.querySelectorAll('.date-item').forEach(d => d.classList.remove('active'));
+                div.classList.add("active");
+
+                loadShows(date);
+            };
+
+            container.appendChild(div);
+        });
+
+        // Auto select first
+        container.firstChild.click();
+    });
+}
+
+// Load Shows
+function loadShows(date) {
+    fetch(`/movies/get-shows/?movie_id=${movieId}&city_id=${selectedCity}&date=${date}`)
+    .then(res => res.json())
+    .then(data => {
+        let container = document.getElementById("theatreContainer");
+        container.innerHTML = "";
+
+        for (let theatre in data.shows) {
+            let theatreData = data.shows[theatre];
+
+            let div = document.createElement("div");
+            div.className = "theatre";
+
+            let header = `
+                <h3>${theatre}</h3>
+                <p>${theatreData.address}, ${theatreData.city}</p>
+            `;
+
+            let times = theatreData.shows.map(show =>
+                `<span class="show-time" onclick="goToSeat(${show.id})">${show.time}</span>`
+            ).join("");
+
+            div.innerHTML = header + times;
+
+            container.appendChild(div);
+        }
+    });
+}
+
+
+function goToSeat(showId) {
+    window.location.href = `/movies/seat-selection/${showId}/`;
+}
+
+
+</script>
+
+
+
+{% endblock %}

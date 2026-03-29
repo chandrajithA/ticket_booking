@@ -1,0 +1,180 @@
+.seat-layout-container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    padding: 30px;
+    align-items: flex-start;
+
+}
+
+.seat-map{
+    flex: 1;
+}
+
+.flight-position{
+    text-align: center;
+    margin: 20px 0px;
+}
+
+.seat-wrapper{
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    
+    
+}
+
+.floor-container{
+    border: 1px solid black;
+    padding: 20px;
+}
+
+.deck-title{
+    text-align: center;
+    margin: 0px 0px 20px 0px;
+    font-size: 18px;
+    font-weight: 550;
+}
+
+
+
+.seat-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+    
+}
+
+.seat {
+    width: 30px;
+    height: 30px;
+    margin: 10px;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;   /* 🔥 removes box */
+    position: relative;
+    cursor: pointer;
+
+}
+
+.seat img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+
+.berth img {
+    width: 50px;
+    height: 90px;
+    object-fit: fill;
+}
+
+/* STATES */
+.available {
+    background: var(--white);
+}
+
+.booked {
+    cursor: not-allowed;
+}
+
+.locked {
+    cursor: not-allowed;
+}
+
+.left-aisle-gap {
+    width: 25px;
+}
+
+.row-label{
+    text-align: center;
+    font-size: 14px;
+    width: 100%;
+}
+
+.right-aisle-gap {
+    width: 25px;
+}
+
+
+/* RIGHT PANEL */
+.booking-panel {
+    width: 280px;
+    
+}
+
+/* LEGEND */
+.legend-box, .summary-box {
+    background: white;
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.legend-box h3 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 450;
+    letter-spacing: 0.5px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.legend-item img {
+    width: 28px;
+    margin-right: 10px;
+}
+
+.legend-item span {
+    flex: 1;
+    font-size: 15px;
+}
+
+.summary-box h3 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 450;
+    letter-spacing: 0.5px;
+}
+
+.summary-box p {
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+/* SUMMARY */
+
+
+.book-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    background: #ff4d4d;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.book-btn:hover {
+    background: #e60000;
+}
+
+.selected {
+    transform: scale(1.02);
+    transition: 0.2s;
+}

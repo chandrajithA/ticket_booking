@@ -1,0 +1,155 @@
+/* MAIN CARD */
+.flight-success-container {
+    width: 600px;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    margin: 40px auto;
+
+}
+
+.flight-success-container .top-header {
+    background: var(--red);
+    color: #fff;
+    text-align: center;
+    padding: 25px 15px 20px;
+    position: relative;
+}
+
+
+.flight-success-container .top-header h2 {
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.flight-success-container .top-header p {
+    font-size: 14px;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
+/* CONTENT */
+.flight-success-container .content {
+    padding: 20px 40px;
+}
+
+.flight-success-container .row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    color: #444;
+}
+
+.flight-success-container .row span {
+    margin-top: 20px;
+}
+
+.flight-success-container .row strong {
+    
+    margin-top: 20px;
+    color: #000;
+}
+
+/* SECTION TITLE */
+.flight-success-container h3 {
+    margin: 15px 0;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.5;
+    margin-bottom: 15px;
+}
+
+/* DETAILS */
+.flight-success-container .detail {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 18px;
+}
+
+.flight-success-container .icon {
+    width: 25px;
+    height: 25px;
+    justify-self: center;
+    align-self: center;
+}
+
+.flight-success-container .icon img{
+    width: 100%;
+    height: 100%;
+}
+
+.flight-success-container .title {
+    font-weight: 500;
+}
+
+.flight-success-container .sub {
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* TOTAL */
+.flight-success-container .total {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    font-size: 16px;
+}
+
+.flight-success-container .total strong {
+    color: #ff4b4b;
+    font-size: 18px;
+}
+
+/* BUTTON */
+.flight-success-container .actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.flight-success-container .actions a {
+    text-align: center;
+}
+
+
+
+.flight-success-container .search-flight-btn {
+    flex: 1;
+    background: var(--white);
+    color: var(--greenish-blue);
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    border: 2px solid var(--greenish-blue);
+}
+
+.flight-success-container .dummy-input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+
+
+/* DIVIDER */
+.flight-success-container hr {
+    border: none;
+    border-top: 1px solid #c9c9c9;
+    margin: 30px 0;
+}
+
+.return-link{
+    text-align: center;
+    margin-bottom: 40px;
+    cursor: pointer;
+    
+}
+
+.return-link a{
+    color: black;
+}
+

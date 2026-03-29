@@ -1,0 +1,564 @@
+{% extends 'booking_app/base.html' %}
+{% load time_filters %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Flights</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/flights_display.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<section class="herocontainer">
+
+    <div class="hero">
+
+        <div class="hero-image-area">
+                    
+             <img src="{% static 'images/flight_carosal.png' %}" class="hero-image-area">
+            
+        </div>
+            
+        
+
+        <div class="hero-text">
+
+            <p class="heading">Search Flights</p>
+            <p class="content">Find the best flight at best place</p>
+
+        </div>
+
+        <!-- TABS (FLOATING OVER HERO) -->
+        
+
+        <div class="search-card">
+
+            <div class="search-form">
+                <input type="text" id="source" placeholder="From" name="source">
+                <input type="text" id="destination" placeholder="To" name="destination">
+                <div class="date-input-wrapper">
+                    <input type="text" placeholder="DD/MM/YYYY" id="flightsearchdateInput" autocomplete="off" name="date">
+                    <img class="date-calender" src="{% static 'images/calendar.png' %}">
+                </div>
+                <button class="search-btn" onclick="searchFlights()">Search Flight</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<div class="flight-container">
+
+    <!-- FILTER SIDEBAR -->
+    <div class="filter-sidebar">
+
+        <div class="filter-header">Filters</div>
+
+        <ul class="filter-list">
+
+            <!-- PRICE -->
+            <li class="filter-item">
+                <div class="filter-title">
+                    Price Range
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+                    <div class="range-slider">
+                        <div class="range-fill" id="rangeFill"></div>
+                        <input type="range" min="{{ min_price }}" max="{{ max_price }}" value="{{ min_price }}" id="minRange">
+                        <input type="range" min="{{ min_price }}" max="{{ max_price }}" value="{{ max_price }}" id="maxRange">
+                    </div>
+
+                    <div class="price-values">
+                        <span id="minPrice">₹{{ min_price }}</span>
+                        <span id="maxPrice">₹{{ max_price }}</span>
+                    </div>
+                </div>
+            </li>
+
+
+    
+            <li class="filter-item">
+                <div class="filter-title">
+                    Depature Time
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+                    <div class="time-box" data-slot="0-6" data-type="departure">
+                        <img src="{% static 'images/early-morning.png' %}">
+                        <span>00:00 - 06:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="6-12" data-type="departure">
+                        <img src="{% static 'images/morning.png' %}">
+                        <span>06:00 - 12:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="12-18" data-type="departure">
+                        <img src="{% static 'images/afternoon.png' %}">
+                        <span>12:00 - 18:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="18-24" data-type="departure">
+                        <img src="{% static 'images/night.png' %}">
+                        <span>18:00 - 24:00</span>
+                    </div>
+                </div>
+            </li>
+
+
+            <li class="filter-item">
+                <div class="filter-title">
+                    Arrival Time
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+                    <div class="time-box" data-slot="0-6" data-type="arrival">
+                        <img src="{% static 'images/early-morning.png' %}">
+                        <span>00:00 - 06:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="6-12" data-type="arrival">
+                        <img src="{% static 'images/morning.png' %}">
+                        <span>06:00 - 12:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="12-18" data-type="arrival">
+                        <img src="{% static 'images/afternoon.png' %}">
+                        <span>12:00 - 18:00</span>
+                    </div>
+
+                    <div class="time-box" data-slot="18-24" data-type="arrival">
+                        <img src="{% static 'images/night.png' %}">
+                        <span>18:00 - 24:00</span>
+                    </div>
+                </div>
+            </li>
+
+            <!-- AIRLINE -->
+            <li class="filter-item">
+                <div class="filter-title">
+                    Airline
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content" id="airlineFilter">
+                    {% for airline in airlines %}
+                    <label class="custom-radio">
+                        <input type="radio" name="airline" value="{{ airline }}">
+                        <span class="radio-circle"></span>
+                        {{ airline }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </li>
+
+            <!-- STOP -->
+            <li class="filter-item">
+                <div class="filter-title">
+                    Stop
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content" id="stopFilter">
+                    {% for stop in stops %}
+                    <label class="custom-radio">
+                        <input type="radio" name="stops" value="{{ stop }}">
+                        <span class="radio-circle"></span>
+                        {% if stop == 0 %}Non Stop{% else %}{{ stop }} Stops{% endif %}
+                    </label>
+                    {% endfor %}
+
+                </div>
+            </li>
+
+        </ul>
+
+    </div>
+
+
+    <div id="flightResults">
+        <!-- RESULT AREA -->
+        {% for trip in trips %}
+        <div class="flight-card">
+
+            <!-- LEFT -->
+            <div class="flight-left">
+
+                <div class="flight-top">
+                    {% if trip.schedule.flight.brand.picture %}
+                    <img src="{{trip.schedule.flight.brand.picture.url}}">
+                    {% endif %}
+                    <div>
+                        <p class="flight-name">{{trip.schedule.flight.flight_name}}</p>
+                        <p class="flight-name">Travel Date - {{trip.travel_date}}</p>
+                        <span class="flight-type">{% if trip.schedule.stops == 0 %}Non stop{% else %}{{trip.schedule.stops}} stops{% endif %}</span>
+                    </div>
+                </div>
+
+                <!-- MIDDLE -->
+                <div class="flight-bottom">
+
+                    <div class="flight-time">
+                        <p>Departure</p>
+                        <p class="time">{{trip.schedule.boarding_time|time:"h:i A"}}</p>
+                        <p>{{trip.schedule.boarding.name}} ({{trip.schedule.boarding.code}})</p>
+                    </div>
+
+                    <div class="flight-time">
+                        <p>Arrival</p>
+                        <p class="time">{{trip.schedule.arrival_time|time:"h:i A"}}</p>
+                        <p>{{trip.schedule.arrival.name}} ({{trip.schedule.arrival.code}})</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+            <div class="flight-right">
+                <div class="right-inner">
+                    <div class="duration-top">
+                        <img src="{% static "images/clock_icon.png" %}" alt="" class="clock-image">
+                        <span class="duration">{{trip.schedule.duration|format_duration}}</span>
+                        <p class="price">₹{{trip.base_price}}</p>
+                    </div>
+
+                    <div class="available-seats"><span class="seat-count notify">{% if trip.available_seats <= 5 %}Seats - {{trip.available_seats}} Left{% endif %}</span></div>
+                    
+                    <button class="flight-right-btn" onclick="window.location.href='{% url 'flight_booking:seat_selection' trip.id %}'">Book Now</button>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+
+
+function getCookie(name) {
+    let cookieValue = null;
+
+    if (document.cookie && document.cookie !== '') {
+        let cookies = document.cookie.split(';');
+
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+
+    return cookieValue;
+}
+
+
+let searchState = {
+    source: "",
+    destination: "",
+    date: "",
+    min_price: 0,
+    max_price: 100000,
+    airlines: [],
+    stops: [],
+    departure_slots: [],
+    arrival_slots: []
+};
+
+
+let airlineContainer = document.getElementById("airlineFilter");
+let stopContainer = document.getElementById("stopFilter");
+const minRange = document.getElementById("minRange");
+const maxRange = document.getElementById("maxRange");
+const minPrice = document.getElementById("minPrice");
+const maxPrice = document.getElementById("maxPrice");
+const rangeFill = document.getElementById("rangeFill");
+
+
+let timer;
+
+function debounceFetch() {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+        fetchFlights();
+    }, 300); // wait 300ms
+}
+
+
+
+function fetchFlights() {
+
+    fetch("/flights/search/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify(searchState)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Server error");
+        return res.json();
+    })
+    .then(data => {
+
+        renderFlights(data.flights);
+
+
+    })
+    .catch(err => console.error(err));
+}
+
+
+
+function searchFlights() {
+    searchState.source = document.getElementById("source").value;
+    searchState.destination = document.getElementById("destination").value;
+    searchState.date = document.getElementById("flightsearchdateInput").value;
+
+    fetchFlights();
+}
+
+
+
+
+
+
+function renderFlights(flights) {
+
+    let container = document.getElementById("flightResults"); // ✅ IMPORTANT
+    container.innerHTML = "";
+
+    if (flights.length === 0) {
+        container.innerHTML = "<p>No flights found</p>";
+        return;
+    }
+
+    flights.forEach(trip => {
+
+        container.innerHTML += `
+        <div class="flight-card">
+
+            <div class="flight-left">
+
+                <div class="flight-top">
+                    <img src="${trip.logo}">
+                    <div>
+                        <p class="flight-name">${trip.flight_name}</p>
+                        <p class="flight-name">Travel Date - ${new Date(trip.travel_date).toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })}</p>
+                        <span class="flight-type">
+                            ${trip.stops == 0 ? "Non stop" : trip.stops + " stops"}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flight-bottom">
+
+                    <div class="flight-time">
+                        <p>Departure</p>
+                        <p class="time">${trip.departure}</p>
+                        <p>${trip.source_name} (${trip.source})</p>
+                    </div>
+
+                    <div class="flight-time">
+                        <p>Arrival</p>
+                        <p class="time">${trip.arrival}</p>
+                        <p>${trip.destination_name} (${trip.destination})</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="flight-right">
+                <div class="right-inner">
+
+                    <div class="duration-top">
+                        <img src="/static/images/clock_icon.png" class="clock-image">
+                        <span class="duration">${trip.duration}</span>
+                        <p class="price">₹${trip.price}</p>
+                    </div>
+
+                    <div class="available-seats">
+                        <span class="seat-count notify">
+                            ${trip.available_seats <= 5 ? `Seats - ${trip.available_seats} Left` : ""}
+                        </span>
+                    </div>
+
+                    <button class="flight-right-btn"
+                        onclick="window.location.href='/flights/seat-selection/${trip.id}/'">
+                        Book Now
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+        `;
+    });
+}
+
+
+
+function renderFilters(filters) {
+
+    // RESET ALL
+    document.querySelectorAll(".time-box").forEach(box => {
+        box.classList.remove("active");
+    });
+
+    // APPLY DEPARTURE
+    filters.departure_slots.forEach(slot => {
+        let el = document.querySelector(`.time-box[data-slot="${slot}"][data-type="departure"]`);
+        if (el) el.classList.add("active");
+    });
+
+    // APPLY ARRIVAL
+    filters.arrival_slots.forEach(slot => {
+        let el = document.querySelector(`.time-box[data-slot="${slot}"][data-type="arrival"]`);
+        if (el) el.classList.add("active");
+    });
+
+}
+
+
+
+document.addEventListener("change", function(e) {
+
+    if (e.target.name === "airline") {
+        searchState.airlines = [e.target.value];
+        fetchFlights(); // instant
+    }
+
+    if (e.target.name === "stops") {
+        searchState.stops = [parseInt(e.target.value)];
+        fetchFlights();
+    }
+
+});
+
+
+minRange.oninput = () => {
+    searchState.min_price = parseInt(minRange.value);
+    updateSlider();
+    debounceFetch();
+};
+
+maxRange.oninput = () => {
+    searchState.max_price = parseInt(maxRange.value);
+    updateSlider();
+    debounceFetch();
+};
+
+
+
+
+document.querySelectorAll(".time-box").forEach(box => {
+
+    box.onclick = () => {
+
+        box.classList.toggle("active");
+
+        let slot = box.dataset.slot;
+        let type = box.dataset.type;
+
+        let targetArray = type === "arrival"
+            ? searchState.arrival_slots
+            : searchState.departure_slots;
+
+        if (box.classList.contains("active")) {
+            if (!targetArray.includes(slot)) {
+                targetArray.push(slot);
+            }
+        } else {
+            if (type === "arrival") {
+                searchState.arrival_slots =
+                    searchState.arrival_slots.filter(s => s !== slot);
+            } else {
+                searchState.departure_slots =
+                    searchState.departure_slots.filter(s => s !== slot);
+            }
+        }
+
+        fetchFlights();
+    };
+});
+
+
+document.querySelectorAll(".filter-title").forEach(title => {
+    title.addEventListener("click", () => {
+        const item = title.parentElement;
+
+        // if already open → close it
+        if(item.classList.contains("active")){
+            item.classList.remove("active");
+        } else {
+
+            // open current
+            item.classList.add("active");
+        }
+    });
+});
+
+
+
+
+function updateSlider() {
+    let minVal = parseInt(minRange.value);
+    let maxVal = parseInt(maxRange.value);
+
+    if (minVal > maxVal) {
+        minRange.value = maxVal;
+        minVal = maxVal;
+    }
+
+    minPrice.innerText = "₹" + minVal;
+    maxPrice.innerText = "₹" + maxVal;
+
+    const maxLimit = parseInt(minRange.max);
+    const minLimit = parseInt(minRange.min);
+
+    let percent1 = ((minVal - minLimit) / (maxLimit - minLimit)) * 100;
+    let percent2 = ((maxVal - minLimit) / (maxLimit - minLimit)) * 100;
+
+    rangeFill.style.left = percent1 + "%";
+    rangeFill.style.width = (percent2 - percent1) + "%";
+}
+
+
+
+updateSlider();
+
+
+
+flatpickr("#flightsearchdateInput", {
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    defaultDate: null,
+    allowInput: true
+});
+
+</script>
+
+{% endblock %}

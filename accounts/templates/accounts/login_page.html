@@ -1,0 +1,72 @@
+{% extends 'booking_app/base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>TravelVerse - Login</title>
+{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/login_page.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<div class="login-container">
+
+    <!-- LEFT SIDE (IMAGE) -->
+    <div class="left-section">
+        <img src="{% static 'images/loginpage.png' %}" alt="Travel Image">
+    </div>
+
+    <!-- RIGHT SIDE (LOGIN BOX) -->
+    <div class="right-section">
+        <div class="login-box">
+            <p class="heading">Welcome Back</p>
+            <p class="sub-heading">Sign in to continue booking</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <input type="hidden" name="next" value="{{ next_url}}">
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" value="{{ prefill.email }}" placeholder="abcde@gmail.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" value="{{ prefill.password }}" name="password" placeholder="********" required>
+                </div>
+
+                <div class="options">
+                    <label class="custom-checkbox">
+                        <input type="checkbox" name="remember_me">
+                        <span class="checkmark"></span>
+                        <span class="checkmark-text">Remember Me<span>
+                    </label>
+                    <a href="#">Forget Password?</a>
+                </div>
+
+                <div class="btn-wrapper">
+                    <button class="login-button">Login</button>
+                </div>
+
+                <p class="signup-text">
+                    Don't have an account? <a href="{% url 'accounts:signup_page' %}">SignUp</a>
+                </p>
+                <hr>
+                <p class="login-disclaimer">By continuing, you agree to BookAll's Terms of Services and Privacy Policy</p>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block script %}
+
+
+{% endblock %}
