@@ -1,0 +1,420 @@
+{% extends 'booking_app/base.html' %}
+{% load time_filters %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Activity</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/activities_display.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<section class="herocontainer">
+
+    <div class="hero">
+
+        <div class="hero-image-area">
+                    
+             <img src="{% static 'images/event_carosal.png' %}" class="hero-image-area">
+            
+        </div>
+            
+        
+
+        <div class="hero-text">
+
+            <p class="heading">Search Events</p>
+            <p class="content">Find the best events at best place</p>
+
+        </div>
+
+        <!-- TABS (FLOATING OVER HERO) -->
+        
+
+        <div class="search-card">
+
+            <div class="search-form">
+                <input type="text" id="name" placeholder="Event Title" name="name">
+                <div class="date-input-wrapper">
+                    <input type="text" placeholder="DD/MM/YYYY" id="eventsearchdateInput" autocomplete="off" name="date">
+                    <img class="date-calender" src="{% static 'images/calendar.png' %}">
+                </div>
+                <button class="search-btn" onclick="searchSports()">Search Sports</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<div class="flight-container">
+
+    <!-- FILTER SIDEBAR -->
+    <div class="filter-sidebar">
+
+        <div class="filter-header">Filters</div>
+
+        <ul class="filter-list">
+
+            <!-- PRICE -->
+            <li class="filter-item">
+                <div class="filter-title">
+                    Price Range
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+                    <div class="range-slider">
+                        <div class="range-fill" id="rangeFill"></div>
+                        <input type="range" min="{{ min_price }}" max="{{ max_price }}" value="{{ min_price }}" id="minRange">
+                        <input type="range" min="{{ min_price }}" max="{{ max_price }}" value="{{ max_price }}" id="maxRange">
+                    </div>
+
+                    <div class="price-values">
+                        <span id="minPrice">₹{{ min_price }}</span>
+                        <span id="maxPrice">₹{{ max_price }}</span>
+                    </div>
+                </div>
+            </li>
+
+
+            <li class="filter-item">
+                <div class="filter-title">
+                    Event Type
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+                    {% for event in event_types %}
+                    <label class="custom-radio">
+                        <input type="radio" name="event" value="{{ event }}">
+                        <span class="radio-circle"></span>
+                        {{ event }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </li>
+
+
+            <li class="filter-item">
+                <div class="filter-title">
+                    City
+                    <span class="arrow">⌄</span>
+                </div>
+
+                <div class="filter-content">
+                    {% for city in cities %}
+                    <label class="custom-radio">
+                        <input type="radio" name="city" value="{{ city }}">
+                        <span class="radio-circle"></span>
+                        {{ city }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </li>
+
+
+        </ul>
+
+    </div>
+
+
+    <div id="movieResults">
+        <!-- RESULT AREA -->
+        {% for event in events %}
+        <div class="sports-card">
+
+            <div class="card-image">
+                <img src="{{event.poster.url}}">
+                <span class="badge">{{event.event.category}}</span>
+            </div>
+
+            <div class="card-body">
+                <h3 class="title">{{event.title}}</h3>
+
+                <div class="info">
+
+                    <div class="info-row">
+                        <img src="{% static 'images/calendar.png' %}">
+                        <span>{{event.event_date}}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <img src="{% static 'images/clock_icon.png' %}">
+                        <span>{{event.event_start_time|time:"h:i A"}} - {{event.event_end_time|time:"h:i A"}}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <img src="{% static 'images/location_black.png' %}">
+                        <span>{{event.address}}, {{event.city.name}}</span>
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+                    <span class="price">₹{{event.seat_price}}</span>
+
+                    <button class="btn-book"
+                        onclick="goToDetails({{event.id}})">
+                        Book Ticket
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+
+// ================= CSRF =================
+function getCookie(name) {
+    let cookieValue = null;
+
+    if (document.cookie && document.cookie !== '') {
+        let cookies = document.cookie.split(';');
+
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+// ================= STATE =================
+let searchState = {
+    search: "",
+    date: "",
+    city: "",
+    event: "",
+    min_price: 0,
+    max_price: 100000,
+    sort: "new_to_old"
+};
+
+
+// ================= SEARCH =================
+function searchSports() {
+    searchState.search = document.getElementById("name").value;
+    fetchSports();
+}
+
+
+// ================= FETCH =================
+function fetchSports() {
+
+    fetch("/activities/search/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify(searchState)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Server error");
+        return res.json();
+    })
+    .then(data => {
+        renderSports(data.events);
+    })
+    .catch(err => console.error("Error:", err));
+}
+
+
+// ================= RENDER =================
+function renderSports(events) {
+
+    let container = document.getElementById("movieResults");
+    container.innerHTML = "";
+
+    if (events.length === 0) {
+        container.innerHTML = "<p>No events found</p>";
+        return;
+    }
+
+    events.forEach(e => {
+
+        container.innerHTML += `
+        <div class="sports-card">
+
+            <div class="card-image">
+                <img src="${e.poster}">
+                <span class="badge">${e.sport}</span>
+            </div>
+
+            <div class="card-body">
+                <h3 class="title">${e.title}</h3>
+
+                <div class="info">
+
+                    <div class="info-row">
+                        <img src="{% static 'images/calendar.png' %}">
+                        <span>${e.date}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <img src="{% static 'images/clock_icon.png' %}">
+                        <span>${e.time}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <img src="{% static 'images/location_black.png' %}">
+                        <span>${e.city}</span>
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+                    <span class="price">₹${e.price}</span>
+
+                    <button class="btn-book"
+                        onclick="goToDetails(${e.id})">
+                        Book Ticket
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+        `;
+    });
+}
+
+
+// ================= NAVIGATION =================
+function goToDetails(id) {
+
+    fetch(`/activities/initiate-booking/${id}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.redirect_url) {
+            window.location.href = data.redirect_url;
+        }
+    });
+}
+
+
+// ================= FILTER EVENTS =================
+document.addEventListener("change", function(e) {
+
+    
+
+    if (e.target.name === "event") {
+        searchState.event = e.target.value;
+        fetchSports();
+    }
+
+    // CITY
+    if (e.target.name === "city") {
+        searchState.city = e.target.value;
+        fetchSports();
+    }
+});
+
+
+// ================= PRICE SLIDER =================
+const minRange = document.getElementById("minRange");
+const maxRange = document.getElementById("maxRange");
+const minPrice = document.getElementById("minPrice");
+const maxPrice = document.getElementById("maxPrice");
+const rangeFill = document.getElementById("rangeFill");
+
+minRange.oninput = () => {
+    searchState.min_price = parseInt(minRange.value);
+    updateSlider();
+    fetchSports();
+};
+
+maxRange.oninput = () => {
+    searchState.max_price = parseInt(maxRange.value);
+    updateSlider();
+    fetchSports();
+};
+
+
+function updateSlider() {
+
+    let minVal = parseInt(minRange.value);
+    let maxVal = parseInt(maxRange.value);
+
+    if (minVal > maxVal) {
+        minRange.value = maxVal;
+        minVal = maxVal;
+    }
+
+    minPrice.innerText = "₹" + minVal;
+    maxPrice.innerText = "₹" + maxVal;
+
+    const maxLimit = parseInt(minRange.max);
+    const minLimit = parseInt(minRange.min);
+
+    let percent1 = ((minVal - minLimit) / (maxLimit - minLimit)) * 100;
+    let percent2 = ((maxVal - minLimit) / (maxLimit - minLimit)) * 100;
+
+    rangeFill.style.left = percent1 + "%";
+    rangeFill.style.width = (percent2 - percent1) + "%";
+}
+
+
+function searchSports() {
+    searchState.search = document.getElementById("name").value;
+    searchState.date = document.getElementById("eventsearchdateInput").value; // ✅ ADD
+
+    fetchSports();
+}
+
+
+
+// ================= FILTER TOGGLE UI =================
+document.querySelectorAll(".filter-title").forEach(title => {
+    title.addEventListener("click", () => {
+        const item = title.parentElement;
+
+        if (item.classList.contains("active")) {
+            item.classList.remove("active");
+        } else {
+            item.classList.add("active");
+        }
+    });
+});
+
+
+
+
+
+flatpickr("#eventsearchdateInput", {
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    defaultDate: null,
+    allowInput: true
+});
+
+
+updateSlider();
+
+</script>
+
+{% endblock %}

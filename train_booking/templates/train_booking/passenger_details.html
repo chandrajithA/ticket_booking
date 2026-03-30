@@ -220,7 +220,7 @@
 <script>
 
 let selectedGender = "male";
-let totalAdded = 0;
+let totalPassengers = 0;
 
 
 
@@ -351,6 +351,7 @@ document.getElementById("addPassengerBtn").addEventListener("click", function ()
             document.querySelector(".gender-box[data-value='male']").classList.add("active");
             selectedGender = "male";
 
+            totalPassengers++;   // ✅ increment
 
             updatePriceUI();
 
@@ -378,6 +379,8 @@ function deletePassenger(passenger_id) {
 
             // remove UI
             document.getElementById(`passenger-${passenger_id}`).remove();
+
+            totalPassengers--;   // ✅ decrement
 
             updatePriceUI();
         }
@@ -421,7 +424,7 @@ let taxPercent = 5;
 
 function updatePriceUI() {
 
-    let subtotal = baseTicketPrice;
+    let subtotal = baseTicketPrice * totalPassengers;
     let tax = (subtotal * taxPercent) / 100;
     let total = subtotal + tax;
 
@@ -596,7 +599,7 @@ document.getElementById("cancelBookingBtn").addEventListener("click", function (
 });
 
 
-
+updatePriceUI();
 
 </script>
 

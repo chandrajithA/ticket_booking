@@ -97,12 +97,12 @@
         <a href="{% url 'train_booking:train_display' %}" class="{% if request.resolver_match.app_name == 'train_booking' %}active{% endif %}"><li><img src="{% static 'images/train_icon.png' %}"> <span>Train</span> </li></a>
         <a href="{% url 'bus_booking:bus_display' %}" class="{% if request.resolver_match.app_name == 'bus_booking' %}active{% endif %}"><li><img src="{% static 'images/bus_icon.png' %}"> <span>Bus</span> </li></a>
         <a href="{% url 'movie_booking:movie_display' %}" class="{% if request.resolver_match.app_name == 'movie_booking' %}active{% endif %}"><li><img src="{% static 'images/movie_icon.png' %}"> <span>Movies</span> </li></a>
-        <a href=""><li><img src="{% static 'images/event_icon.png' %}"> <span>Events</span> </li></a>
-        <a href=""><li><img src="{% static 'images/sport_icon.png' %}"> <span>Sports</span> </li></a>
-        <a href=""><li><img src="{% static 'images/activity_icon.png' %}"> <span>Activities</span> </li></a>
+        <a href="{% url 'event_booking:events_display' %}" class="{% if request.resolver_match.app_name == 'event_booking' %}active{% endif %}"><li><img src="{% static 'images/event_icon.png' %}"> <span>Events</span> </li></a>
+        <a href="{% url 'sport_booking:sports_display' %}" class="{% if request.resolver_match.app_name == 'sport_booking' %}active{% endif %}"><li><img src="{% static 'images/sport_icon.png' %}"> <span>Sports</span> </li></a>
+        <a href="{% url 'activity_booking:activities_display' %}" class="{% if request.resolver_match.app_name == 'activity_booking' %}active{% endif %}"><li><img src="{% static 'images/activity_icon.png' %}"> <span>Activities</span> </li></a>
         <a href=""><li><img src="{% static 'images/hotel_icon.png' %}"> <span>Hotels</span> </li></a>
         {% if user.is_authenticated %}
-        <a href=""><li><span>My Bookings</span></li></a>
+        {% comment %} <a href=""><li><span>My Bookings</span></li></a> {% endcomment %}
         {% endif %}
 
     </ul>

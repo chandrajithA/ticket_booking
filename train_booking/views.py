@@ -1,10 +1,8 @@
 from django.shortcuts import render, redirect , get_object_or_404
 from .models import *
-from collections import defaultdict
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import uuid
-from django.db.models import Sum, Max
 from django.utils import timezone
 from datetime import timedelta, datetime
 from django.views.decorators.http import require_POST

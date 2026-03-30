@@ -191,13 +191,21 @@ if DEBUG:
 else:
 
 
-
     DATABASES = {
-        'default': dj_database_url.config(
-            default=env("DATABASE_URL"),
-            engine='django.db.backends.mysql',
-        )
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': env("ANYWHERE_DB_NAME"),
+            'USER': env("ANYWHERE_DB_USER"),
+            'PASSWORD': env("ANYWHERE_DB_PASSWORD"),
+            'HOST': env("ANYWHERE_DB_HOST"),
+            'PORT': env("ANYWHERE_DB_PORT"),
+            'OPTIONS': {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
+        }
     }
+
+    
 
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 

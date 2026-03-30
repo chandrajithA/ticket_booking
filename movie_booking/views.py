@@ -4,9 +4,9 @@ from collections import defaultdict
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import uuid
-from django.db.models import Sum, Max, Min
+from django.db.models import Sum
 from django.utils import timezone
-from datetime import timedelta, datetime
+from datetime import timedelta
 from django.views.decorators.http import require_POST
 import json
 from django.http import JsonResponse
@@ -15,11 +15,8 @@ from .models import Payment
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
 from movie_booking.payment_utils import calculate_booking_amount
-from datetime import date
-from django.db.models import Q
-from .seat_utils import update_available_seats
-from django.db.models.functions import TruncDate    
-from .constants import MOVIE_SERVICE_CHARGE, MOVIE_TAX_PERCENT
+from .seat_utils import update_available_seats   
+from .constants import MOVIE_SERVICE_CHARGE
 
 
 def movie_display(request):
@@ -273,7 +270,7 @@ def initiate_booking(request, show_id):
 @login_required
 def booking_details(request, current_booking_id):   
         
-    # if request.session.pop('just_created_booking', False):
+    if request.session.pop('just_created_booking', False):
 
         session_booking_id = request.session.get('booking_id')
         show_id = request.session.get('show_id')
@@ -328,59 +325,59 @@ def booking_details(request, current_booking_id):
             'expiry_time': booking.expires_at.timestamp(),
         })
 
-    # else:
-    #     # SECOND visit → delete old booking
+    else:
+        # SECOND visit → delete old booking
 
-    #     booking = MovieShowBooking.objects.filter(
-    #         id=current_booking_id,
-    #         user=request.user,
-    #         status='pending'
-    #     ).first()
+        booking = MovieShowBooking.objects.filter(
+            id=current_booking_id,
+            user=request.user,
+            status='pending'
+        ).first()
 
-    #     if booking:
+        if booking:
 
-    #         # 🔓 unlock seats
-    #         MovieShowSeatAvailability.objects.filter(
-    #             show=booking.show,
-    #             status='locked',
-    #             is_booked = False,
-    #             locked_by=request.user
-    #         ).update(
-    #             status='available',
-    #             locked_by=None,
-    #             locked_at=None
-    #         )
+            # 🔓 unlock seats
+            MovieShowSeatAvailability.objects.filter(
+                show=booking.show,
+                status='locked',
+                is_booked = False,
+                locked_by=request.user
+            ).update(
+                status='available',
+                locked_by=None,
+                locked_at=None
+            )
 
-    #         # cancel booking (not delete)
-    #         booking.status = 'cancelled'
-    #         booking.cancelled_at = timezone.now()
-    #         booking.save()
+            # cancel booking (not delete)
+            booking.status = 'cancelled'
+            booking.cancelled_at = timezone.now()
+            booking.save()
 
-    #         MovieShowBookingSeat.objects.filter(
-    #             booking=booking,
-    #         ).delete()
+            MovieShowBookingSeat.objects.filter(
+                booking=booking,
+            ).delete()
 
-    #         # clear session
-    #         for key in ['booking_id', 'show_id', 'selected_seats', 'just_created_booking']:
-    #             request.session.pop(key, None)
+            # clear session
+            for key in ['booking_id', 'show_id', 'selected_seats', 'just_created_booking']:
+                request.session.pop(key, None)
 
-    #         payment = Payment.objects.filter(booking=booking).first()
+            payment = Payment.objects.filter(booking=booking).first()
 
-    #         if payment:
+            if payment:
                 
-    #             payment.payment_status = 'cancelled'
-    #             payment.error_description = 'Payment cancelled'
-    #             payment.save()
+                payment.payment_status = 'cancelled'
+                payment.error_description = 'Payment cancelled'
+                payment.save()
 
-    #             messages.warning(request, "Booking and payment cancelled successfully.")
-    #             return JsonResponse({"success": True})
+                messages.warning(request, "Booking and payment cancelled successfully.")
+                return JsonResponse({"success": True})
 
-    #     else:
-    #         messages.warning(request, "Error in cancel booking.")
-    #         return JsonResponse({"success": False})
+        else:
+            messages.warning(request, "Error in cancel booking.")
+            return JsonResponse({"success": False})
 
-    #     messages.warning(request, "Page Refreshed. Booking Cancelled")
-    #     return redirect('movie_booking:seat_selection', show_id=booking.show.id)
+        messages.warning(request, "Page Refreshed. Booking Cancelled")
+        return redirect('movie_booking:seat_selection', show_id=booking.show.id)
     
 
         

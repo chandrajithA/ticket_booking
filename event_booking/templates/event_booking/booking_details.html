@@ -1,0 +1,357 @@
+{% extends 'booking_app/base.html' %}
+{% load time_filters %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Event Booking Details</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/events_booking_details.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+
+
+<div class="passenger-container">
+
+    <!-- LEFT SIDE -->
+    
+
+
+    <!-- RIGHT SIDE -->
+    <div class="right-card">
+        <div class="card-header">Booking Info</div>
+
+        <!-- FLIGHT TOP -->
+        <!-- TOP -->
+        <div class="top-row">
+            <span>Time Left:</span><div id="timer" style="font-size:18px; color:red;"></div>
+            <button id="cancelBookingBtn" class="booking-cancel-btn">Cancel Booking</button>
+        </div>
+
+        <hr>
+
+        <div class="input-icon">
+            <span style="margin-bottom:15px;display:block;">Select Ticket Count</span>
+            <div class="select-wrapper">
+                <select id="ticket_count" class="input">
+                    <option value="1">Ticket 1</option>
+                    <option value="2">Ticket 2</option>
+                    <option value="3">Ticket 3</option>
+                    <option value="4">Ticket 4</option>
+                    <option value="5">Ticket 5</option>
+                    <option value="6">Ticket 6</option>
+                    <option value="7">Ticket 7</option>
+                    <option value="8">Ticket 8</option>
+                    <option value="9">Ticket 9</option>
+                    <option value="10">Ticket 10</option>
+                </select>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="top-row">
+            <img src="{{ booking.event.poster.url }}" class="logo">
+            <div class="airline-name">
+                {{ booking.event.title }} <p style="display:block;">{{ booking.event.event.category }} - {{ booking.event.language }}</p>
+            </div>
+            
+        </div>
+
+        <hr>
+
+        <!-- FLIGHT INFO -->
+        <div class="info-row">
+            <div>
+                <p class="value">Stadium Name: {{ booking.event.stadium.name }}</p>
+            </div>
+
+            <div class="right">
+                
+                <span class="value">Date: {{ booking.event.event_date }}</span>
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div>
+                <p class="value">Address: {{ booking.event.stadium.address }}, {{ booking.event.stadium.city.name }}</p>
+            </div>
+
+            <div class="right">
+
+                <p class="value">Time: {{ booking.event.event_time|time:"h:i A" }}</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- DISCOUNT -->
+        <div class="section">
+            <p class="section-title">Discount Option</p>
+
+            <div class="coupon">
+                <span class="gear">⚙</span>
+                <input type="text" placeholder="Enter Code">
+                <button><span>→</span></button>
+            </div>
+        </div>
+
+        <hr>
+
+        <input type="hidden" id="singlePrice" value="{{ single_ticket_price }}">
+        <!-- FARE -->
+        <div class="section">
+            <p class="section-title">Fare Details</p>
+
+            <div class="fare-row">
+                <span>Ticket Price</span>
+                <span>₹<span id="ticketPrice">0</span></span>
+            </div>
+
+            <div class="fare-row">
+                <span>Tax (5%) </span>
+                <span>₹<span id="taxPrice">0</span></span>
+            </div>
+
+            <div class="fare-row total">
+                <span>Total Price</span>
+                <span>₹<span id="totalPrice">0</span></span>
+            </div>
+        </div>
+
+        <!-- BUTTON -->
+        <div class="pay-btn-wrapper">
+            <button class="pay-btn" onclick="startPayment()">Continue Payment</button>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+
+
+
+
+let ticketSelect = document.getElementById("ticket_count");
+
+
+let totalViewers = parseInt(ticketSelect.value);
+
+let singleTicketPrice = parseFloat(document.getElementById("singlePrice").value);
+let taxPercent = 5;
+
+
+
+// CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie) {
+        document.cookie.split(';').forEach(cookie => {
+            if (cookie.trim().startsWith(name + '=')) {
+                cookieValue = cookie.split('=')[1];
+            }
+        });
+    }
+    return cookieValue;
+}
+
+
+
+function updatePriceUI() {
+
+    let subtotal = singleTicketPrice * totalViewers;
+    let tax = (subtotal * taxPercent) / 100;
+    let total = subtotal + tax;
+
+    document.getElementById("ticketPrice").innerText = subtotal.toFixed(2);
+    document.getElementById("taxPrice").innerText = tax.toFixed(2);
+    document.getElementById("totalPrice").innerText = total.toFixed(2);
+}
+
+
+ticketSelect.addEventListener("change", function () {
+    totalViewers = parseInt(this.value);   // ✅ get selected value
+    updatePriceUI();                       // ✅ update UI
+});
+
+
+
+
+function cancelBooking() {
+    return fetch("/events/cancel-booking/{{ booking.id }}/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    }).then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'event_booking:payment_failed' booking.id %}";
+        }
+        else {
+            window.location.href = "{% url 'event_booking:events_display' %}";
+        }
+    });
+}
+
+
+
+
+
+function expireBooking() {
+    return fetch("/events/expire-booking/{{ booking.id }}/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    }).then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'event_booking:events_display' %}";
+        }
+        else {
+            window.location.href = "{% url 'event_booking:events_display' %}";
+        }
+    });
+}
+
+
+
+
+const expiryTime = {{ expiry_time|safe }} * 1000; // convert to ms
+const timerEl = document.getElementById("timer");
+
+const interval = setInterval(() => {
+
+    const now = new Date().getTime();
+    const distance = expiryTime - now;
+
+    if (distance <= 0) {
+
+        clearInterval(interval);
+        timerEl.innerHTML = "Time Out";
+
+        console.log("Timer Out → Booking Cancelled");
+
+        expireBooking();
+
+        return;
+    }
+
+    const minutes = Math.floor(distance / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    timerEl.innerHTML = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+}, 1000);
+
+
+
+
+
+function startPayment() {
+
+
+    fetch("{% url 'event_booking:create_payment_order' booking.id %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({
+            ticket_count: totalViewers   // ✅ send dropdown value
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (!data.success) {
+            alert("Select no of seats not available");
+            return;
+        }
+
+        openRazorpay(data);
+    });
+}
+
+
+function openRazorpay(data) {
+
+    var options = {
+        "key": data.key,
+        "amount": data.amount,
+        "currency": "INR",
+        "name": "TravelVerse",
+        "description": "Sports Ticket Booking",
+        "order_id": data.order_id,
+
+        "handler": function (response) {
+            verifyPayment(response);
+        },
+
+        "modal": {
+            "ondismiss": function () {
+                
+                    cancelBooking();
+                  
+            }
+        }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+}
+
+
+
+
+
+function verifyPayment(response) {
+
+    fetch("{% url 'event_booking:verify_payment' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify(response)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'event_booking:payment_success' booking.id %}";
+        } else {
+            cancelBooking();
+        }
+    })
+    .catch(() => {
+        cancelBooking();
+    });
+}
+
+
+document.getElementById("cancelBookingBtn").addEventListener("click", function () {
+
+    if (!confirm("Are you sure you want to cancel booking?")) return;
+
+    cancelBooking()
+
+});
+
+
+updatePriceUI();
+
+
+</script>
+
+{% endblock %}

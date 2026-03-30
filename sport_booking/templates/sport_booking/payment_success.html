@@ -1,0 +1,118 @@
+{% extends 'booking_app/base.html' %}
+{% load time_filters %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Payment Success</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/flight_payment_success.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="flight-success-container">
+
+    <!-- TOP HEADER -->
+    <div class="top-header">
+        <h2>Booking Confirmed!</h2>
+        <p>Your booking has been successfully confirmed</p>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <div class="row">
+            <span>Booking Reference</span>
+            <strong>{{booking.booking_reference}}</strong>
+        </div>
+
+        <div class="row">
+            <span>Booking Date</span>
+            <strong>{{booking.booking_date|date:"F j, Y - h:i A"}}</strong>
+        </div>
+
+        <hr>
+
+        <h3>Booking Details</h3>
+
+        <!-- Flight -->
+        <div class="detail">
+            <div class="icon"><img src="{% static 'images/sport_icon.png' %}"></div>
+            <div>
+                <p class="title"> {{ booking.event.title }} </p>
+                <p class="sub">{{ booking.event.team1_name }} vs {{ booking.event.team2_name }} ({{ booking.event.sport.category }})</p>
+            </div>
+        </div>
+
+        <!-- Date -->
+        <div class="detail">
+            <div class="icon"><img src="{% static 'images/red-calender.png' %}"></div>
+            <div>
+                <p class="title">{{ booking.event.sport_date }}</p>
+                <p class="sub">{{ booking.event.sport_time|time:"h:i A" }} </p>
+            </div>
+        </div>
+
+        <!-- Seats -->
+        <div class="detail">
+            <div class="icon">
+                <img src="{% static 'images/economy.png' %}">
+            </div>
+            <div>
+                <p class="title">Seats count - {{ booking_seats|length }}</p>
+                <p class="sub">Seat Numbers - 
+                    {% for s in booking_seats %}
+                        {{ s.seat.seat_number }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Route -->
+        <div class="detail">
+            <div class="icon"><img src="{% static 'images/red-location.png' %}"></div>
+            <div>
+                <p class="title">{{ booking.event.stadium.name }} </p>
+                <p class="sub">{{ booking.event.stadium.address }}, {{ booking.event.stadium.city.name }}</p>
+            </div>
+        </div>
+
+    
+
+        
+
+        <hr>
+
+        <!-- TOTAL -->
+        <div class="total">
+            <span>Total Amount Paid</span>
+            <strong>₹{{booking.total_amount}}</strong>
+        </div>
+
+        <!-- BUTTON -->
+        <div class="actions">
+            <a class="download-btn">Download Ticket</a>
+        </div>
+
+        <div class="actions">
+            <a href="{% url "sport_booking:sports_display" %}" class="search-flight-btn">Search Sports Event</a>
+        </div>
+
+        <p class="footer-text">
+            A confirmation email has been sent to your registered email address
+        </p>
+
+    </div>
+
+    
+
+</div>
+
+<p class="return-link"><a href="{% url 'booking_app:index_page' %}">Return Home</a></p>
+
+{% endblock %}
+
+
+{% block script %}
+
+{% endblock %}
