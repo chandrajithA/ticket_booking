@@ -100,7 +100,7 @@
         <a href="{% url 'event_booking:events_display' %}" class="{% if request.resolver_match.app_name == 'event_booking' %}active{% endif %}"><li><img src="{% static 'images/event_icon.png' %}"> <span>Events</span> </li></a>
         <a href="{% url 'sport_booking:sports_display' %}" class="{% if request.resolver_match.app_name == 'sport_booking' %}active{% endif %}"><li><img src="{% static 'images/sport_icon.png' %}"> <span>Sports</span> </li></a>
         <a href="{% url 'activity_booking:activities_display' %}" class="{% if request.resolver_match.app_name == 'activity_booking' %}active{% endif %}"><li><img src="{% static 'images/activity_icon.png' %}"> <span>Activities</span> </li></a>
-        <a href=""><li><img src="{% static 'images/hotel_icon.png' %}"> <span>Hotels</span> </li></a>
+        <a href="{% url 'hotel_booking:hotels_display' %}" class="{% if request.resolver_match.app_name == 'hotel_booking' %}active{% endif %}"><li><img src="{% static 'images/hotel_icon.png' %}"> <span>Hotels</span> </li></a>
         {% if user.is_authenticated %}
         {% comment %} <a href=""><li><span>My Bookings</span></li></a> {% endcomment %}
         {% endif %}
@@ -116,6 +116,8 @@
   </div>
 
 </div>
+
+
 
 
 

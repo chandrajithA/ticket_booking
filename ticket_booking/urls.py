@@ -30,7 +30,7 @@ urlpatterns = [
     path("sports/", include("sport_booking.urls")),
     path("events/", include("event_booking.urls")),
     path("activities/", include("activity_booking.urls")),
-    # path("hotels/", include("hotel_booking.urls")),
+    path("hotels/", include("hotel_booking.urls")),
     path("users/", include("accounts.urls")), 
 ]
 

@@ -173,6 +173,7 @@ def get_shows(request):
     return JsonResponse({"shows": data})
 
 
+@login_required
 def seat_selection(request, show_id):
     
     clean_expired_bookings()
@@ -201,7 +202,6 @@ def seat_selection(request, show_id):
     
 
 @require_POST
-@login_required
 def initiate_booking(request, show_id):     
 
     if request.method == "POST":

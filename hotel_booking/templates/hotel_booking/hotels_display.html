@@ -5,7 +5,7 @@
 {% block title %}<title>TravelVerse - Activity</title>{% endblock %}
 
 {% block style %}
-    <link rel="stylesheet" href="{% static 'css/activities_display.css' %}">
+    <link rel="stylesheet" href="{% static 'css/hotels_display.css' %}">
 {% endblock %}
 
 
@@ -36,15 +36,21 @@
         <div class="search-card">
 
             <div class="search-form">
-                <input type="text" id="name" placeholder="Event Title" name="name">
+                <input type="text" id="name" placeholder="Hotel" name="name">
                 <div class="date-input-wrapper">
-                    <input type="text" placeholder="DD/MM/YYYY" id="eventsearchdateInput" autocomplete="off" name="date">
+                    <input type="text" placeholder="Check In" id="hotelsearchcheckindateInput" autocomplete="off" name="date">
                     <img class="date-calender" src="{% static 'images/calendar.png' %}">
                 </div>
-                <button class="search-btn" onclick="searchSports()">Search Sports</button>
+                <div class="date-input-wrapper">
+                    <input type="text" placeholder="Check Out" id="hotelsearchcheckoutdateInput" autocomplete="off" name="date">
+                    <img class="date-calender" src="{% static 'images/calendar.png' %}">
+                </div>
+                <button class="search-btn" onclick="searchHotels()">Search Sports</button>
             </div>
 
         </div>
+
+        
 
     </div>
 
@@ -83,16 +89,16 @@
 
             <li class="filter-item">
                 <div class="filter-title">
-                    Event Type
+                    Hotel Type
                     <span class="arrow">⌄</span>
                 </div>
 
                 <div class="filter-content">
-                    {% for event in event_types %}
+                    {% for hotel in hotel_types %}
                     <label class="custom-radio">
-                        <input type="radio" name="event" value="{{ event }}">
+                        <input type="radio" name="hotel" value="{{ hotel }}">
                         <span class="radio-circle"></span>
-                        {{ event }}
+                        {{ hotel }}
                     </label>
                     {% endfor %}
                 </div>
@@ -122,44 +128,54 @@
     </div>
 
 
-    <div id="movieResults">
+    <div id="hotelResults">
         <!-- RESULT AREA -->
-        {% for event in events %}
+        {% for hotel in hotels %}
         <div class="sports-card">
 
             <div class="card-image">
-                <img src="{{event.poster.url}}">
-                <span class="badge">{{event.event.category}}</span>
+                <img src="{{hotel.poster.url}}">
+                <span class="badge">{{hotel.category}}</span>
             </div>
 
             <div class="card-body">
-                <h3 class="title">{{event.title}}</h3>
+                <h3 class="title">{{hotel.title}}</h3>
 
                 <div class="info">
 
                     <div class="info-row">
-                        <img src="{% static 'images/calendar.png' %}">
-                        <span>{{event.event_date}}</span>
-                    </div>
-
-                    <div class="info-row">
-                        <img src="{% static 'images/clock_icon.png' %}">
-                        <span>{{event.event_start_time|time:"h:i A"}} - {{event.event_end_time|time:"h:i A"}}</span>
-                    </div>
-
-                    <div class="info-row">
                         <img src="{% static 'images/location_black.png' %}">
-                        <span>{{event.address}}, {{event.city.name}}</span>
+                        <span>{{hotel.address}}, {{hotel.city.name}}</span>
                     </div>
+
+                    <div>
+                        <span>Popular Amenities</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span>{% if hotel.is_wifi %}WiFi{% endif %}
+                            {% if hotel.is_pool %} | Pool{% endif %}
+                            {% if hotel.is_spa %} | Spa{% endif %}
+                            {% if hotel.is_restaurant %} | Restaurant{% endif %}
+                            {% if hotel.is_gym %} | Gym{% endif %}
+                            {% if hotel.is_parking %} | Parking{% endif %}
+                        </span>
+                    </div>
+
+                    
 
                 </div>
 
                 <div class="card-footer">
-                    <span class="price">₹{{event.seat_price}}</span>
+                    <div>
+                        <div>Per night</div>
+                        <div class="price">₹{{hotel.room_price}}</div>
+                        
+                    </div>
 
                     <button class="btn-book"
-                        onclick="goToDetails({{event.id}})">
-                        Book Ticket
+                        onclick="goToDetails({{hotel.id}})">
+                        Book Rooms
                     </button>
                 </div>
 
@@ -201,18 +217,20 @@ function getCookie(name) {
 // ================= STATE =================
 let searchState = {
     search: "",
-    date: "",
+    checkin_date: "",
+    checkout_date: "",
     city: "",
-    event: "",
+    hotel: "",
     min_price: 0,
     max_price: 100000,
 };
 
 
-// ================= FETCH =================
-function fetchSports() {
 
-    fetch("/activities/search/", {
+// ================= FETCH =================
+function fetchHotels() {
+
+    fetch("/hotels/search/", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -225,61 +243,65 @@ function fetchSports() {
         return res.json();
     })
     .then(data => {
-        renderSports(data.events);
+        renderHotels(data.hotels);
     })
     .catch(err => console.error("Error:", err));
 }
 
 
 // ================= RENDER =================
-function renderSports(events) {
+function renderHotels(hotels) {
 
-    let container = document.getElementById("movieResults");
+    let container = document.getElementById("hotelResults");
     container.innerHTML = "";
 
-    if (events.length === 0) {
-        container.innerHTML = "<p>No events found</p>";
+    if (hotels.length === 0) {
+        container.innerHTML = "<p>No hotels found</p>";
         return;
     }
 
-    events.forEach(e => {
+    hotels.forEach(h => {
 
         container.innerHTML += `
         <div class="sports-card">
 
             <div class="card-image">
-                <img src="${e.poster}">
-                <span class="badge">${e.sport}</span>
+                <img src="${h.poster}">
+                <span class="badge">${h.category}</span>
             </div>
 
             <div class="card-body">
-                <h3 class="title">${e.title}</h3>
+                <h3 class="title">${h.title}</h3>
 
                 <div class="info">
 
                     <div class="info-row">
-                        <img src="{% static 'images/calendar.png' %}">
-                        <span>${e.date}</span>
+                        <img src="/static/images/location_black.png">
+                        <span>${h.city}</span>
+                    </div>
+
+                    <div>
+                        <span>Popular Amenities</span>
                     </div>
 
                     <div class="info-row">
-                        <img src="{% static 'images/clock_icon.png' %}">
-                        <span>${e.time}</span>
-                    </div>
-
-                    <div class="info-row">
-                        <img src="{% static 'images/location_black.png' %}">
-                        <span>${e.city}</span>
+                        <span>${h.amenities}</span>
                     </div>
 
                 </div>
 
+                
+
                 <div class="card-footer">
-                    <span class="price">₹${e.price}</span>
+                    <div>
+                        <div>Per night</div>
+                        <div class="price">₹${h.price}</div>
+                        
+                    </div>
 
                     <button class="btn-book"
-                        onclick="goToDetails(${e.id})">
-                        Book Ticket
+                        onclick="goToDetails(${h.id})">
+                        Book Rooms
                     </button>
                 </div>
 
@@ -294,7 +316,7 @@ function renderSports(events) {
 // ================= NAVIGATION =================
 function goToDetails(id) {
 
-    fetch(`/activities/initiate-booking/${id}/`, {
+    fetch(`/hotels/initiate-booking/${id}/`, {
         method: "POST",
         headers: {
             "X-CSRFToken": getCookie("csrftoken")
@@ -312,17 +334,15 @@ function goToDetails(id) {
 // ================= FILTER EVENTS =================
 document.addEventListener("change", function(e) {
 
-    
-
-    if (e.target.name === "event") {
-        searchState.event = e.target.value;
-        fetchSports();
+    if (e.target.name === "hotel") {
+        searchState.hotel = e.target.value;
+        fetchHotels();
     }
 
     // CITY
     if (e.target.name === "city") {
         searchState.city = e.target.value;
-        fetchSports();
+        fetchHotels();
     }
 });
 
@@ -337,13 +357,13 @@ const rangeFill = document.getElementById("rangeFill");
 minRange.oninput = () => {
     searchState.min_price = parseInt(minRange.value);
     updateSlider();
-    fetchSports();
+    fetchHotels();
 };
 
 maxRange.oninput = () => {
     searchState.max_price = parseInt(maxRange.value);
     updateSlider();
-    fetchSports();
+    fetchHotels();
 };
 
 
@@ -371,11 +391,11 @@ function updateSlider() {
 }
 
 
-function searchSports() {
+function searchHotels() {
     searchState.search = document.getElementById("name").value;
-    searchState.date = document.getElementById("eventsearchdateInput").value; // ✅ ADD
-
-    fetchSports();
+    searchState.checkin_date = document.getElementById("hotelsearchcheckindateInput").value; // ✅ ADD
+    searchState.checkout_date = document.getElementById("hotelsearchcheckoutdateInput").value;
+    fetchHotels();
 }
 
 
@@ -395,9 +415,16 @@ document.querySelectorAll(".filter-title").forEach(title => {
 
 
 
+flatpickr("#hotelsearchcheckindateInput", {
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    defaultDate: null,
+    allowInput: true
+});
 
 
-flatpickr("#eventsearchdateInput", {
+
+flatpickr("#hotelsearchcheckoutdateInput", {
     dateFormat: "Y-m-d",
     minDate: "today",
     defaultDate: null,

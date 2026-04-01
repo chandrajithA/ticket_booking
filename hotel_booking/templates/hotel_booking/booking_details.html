@@ -1,0 +1,434 @@
+{% extends 'booking_app/base.html' %}
+{% load time_filters %}
+{% load static %}
+
+{% block title %}<title>TravelVerse - Hotels Booking Details</title>{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/hotels_booking_details.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+
+
+<div class="passenger-container">
+
+    <!-- LEFT SIDE -->
+    
+
+
+    <!-- RIGHT SIDE -->
+    <div class="right-card">
+        <div class="card-header">Booking Info</div>
+
+        <!-- FLIGHT TOP -->
+        <!-- TOP -->
+        <div class="top-row">
+            <span>Time Left:</span><div id="timer" style="font-size:18px; color:red;"></div>
+            <button id="cancelBookingBtn" class="booking-cancel-btn">Cancel Booking</button>
+        </div>
+
+        <hr>
+
+        <div class="row align-center">
+
+            <div class="dob-wrapper">
+                <label>Check In</label>
+                <div class="input-icon">
+                    
+                    <input type="text" placeholder="DD/MM/YYYY*" class="input" id="checkinDateInput" autocomplete="off" name="checkin">
+                </div>
+            </div>
+
+            <div class="dob-wrapper">
+                <label>Check Out</label>
+                <div class="input-icon">
+                    
+                    <input type="text" placeholder="DD/MM/YYYY*" class="input" id="checkoutDateInput" autocomplete="off" name="checkout">
+                </div>
+            </div>
+        </div>
+
+        <div class="input-icon">
+            <span style="margin-bottom:15px;display:block;">Select Room Count</span>
+            <div class="select-wrapper">
+                <select id="room_count" class="input">
+                    <option value="1">Room 1</option>
+                    <option value="2">Room 2</option>
+                    <option value="3">Room 3</option>
+                    <option value="4">Room 4</option>
+                    <option value="5">Room 5</option>
+                    <option value="6">Room 6</option>
+                    <option value="7">Room 7</option>
+                    <option value="8">Room 8</option>
+                    <option value="9">Room 9</option>
+                    <option value="10">Room 10</option>
+                </select>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="top-row">
+            <img src="{{ booking.hotel.poster.url }}" class="logo">
+            <div class="airline-name">
+                {{ booking.hotel.title }} <p style="display:block;">{{ booking.hotel.category }}</p>
+            </div>
+            
+        </div>
+
+        <hr>
+
+        <!-- FLIGHT INFO -->
+        <div class="info-row">
+            <div>
+                <p class="value">Address: {{ booking.hotel.address }}</p>
+            </div>
+
+            
+        </div>
+
+        <div class="info-row">
+            <div>
+                <p class="value">City: {{ booking.hotel.city.name }}</p>
+            </div>
+
+            
+        </div>
+
+        <hr>
+
+        <!-- DISCOUNT -->
+        <div class="section">
+            <p class="section-title">Discount Option</p>
+
+            <div class="coupon">
+                <span class="gear">⚙</span>
+                <input type="text" placeholder="Enter Code">
+                <button><span>→</span></button>
+            </div>
+        </div>
+
+        <hr>
+
+        <input type="hidden" id="singlePrice" value="{{ single_room_price }}">
+        <!-- FARE -->
+        <div class="section">
+            <p class="section-title">Fare Details</p>
+
+            <div class="fare-row">
+                <span id="ticketPriceText">Room Price</span>
+                <span>₹<span id="ticketPrice">0</span></span>
+            </div>
+
+            <div class="fare-row">
+                <span>Tax (18%) </span>
+                <span>₹<span id="taxPrice">0</span></span>
+            </div>
+
+            <div class="fare-row total">
+                <span>Total Price</span>
+                <span>₹<span id="totalPrice">0</span></span>
+            </div>
+        </div>
+
+        <!-- BUTTON -->
+        <div class="pay-btn-wrapper">
+            <button class="pay-btn" onclick="startPayment()">Continue Payment</button>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+
+
+
+
+let roomSelect = document.getElementById("room_count");
+
+let totalRooms = parseInt(roomSelect.value);
+
+let singleRoomPrice = parseFloat(document.getElementById("singlePrice").value);
+let taxPercent = 18;
+
+
+// CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie) {
+        document.cookie.split(';').forEach(cookie => {
+            if (cookie.trim().startsWith(name + '=')) {
+                cookieValue = cookie.split('=')[1];
+            }
+        });
+    }
+    return cookieValue;
+}
+
+function calculateNights() {
+
+    let check_in = document.getElementById("checkinDateInput").value;
+    let check_out = document.getElementById("checkoutDateInput").value;
+
+    if (!check_in || !check_out) return 0;
+
+    let inDate = new Date(check_in);
+    let outDate = new Date(check_out);
+
+    // ❌ invalid order
+    if (outDate <= inDate) {
+        showError("Check-out must be after check-in");
+        return 0;
+    }
+
+    // ✅ calculate nights
+    let diffTime = outDate - inDate;
+    let nights = diffTime / (1000 * 60 * 60 * 24);
+
+    return nights;
+}
+
+
+
+function updatePriceUI() {
+
+    let nights = calculateNights();
+
+    if (nights === 0) {
+        document.getElementById("ticketPrice").innerText = "0";
+        document.getElementById("taxPrice").innerText = "0";
+        document.getElementById("totalPrice").innerText = "0";
+        return;
+    }
+
+    let subtotal = singleRoomPrice * totalRooms * nights;
+    let tax = (subtotal * taxPercent) / 100;
+    let total = subtotal + tax;
+
+    document.getElementById("ticketPriceText").innerText =
+        `Room Price : ${nights} Nights × ${singleRoomPrice} × ${totalRooms} Room`;
+    
+
+    document.getElementById("ticketPrice").innerText = subtotal.toFixed(2);
+    document.getElementById("taxPrice").innerText = tax.toFixed(2);
+    document.getElementById("totalPrice").innerText = total.toFixed(2);
+}
+
+document.getElementById("checkinDateInput").addEventListener("change", function () {
+    updatePriceUI();
+});
+
+document.getElementById("checkoutDateInput").addEventListener("change", function () {
+    updatePriceUI();
+});
+
+roomSelect.addEventListener("change", function () {
+    totalRooms = parseInt(this.value);   // ✅ get selected value
+    updatePriceUI();                       // ✅ update UI
+});
+
+
+
+
+function cancelBooking() {
+    return fetch("/hotels/cancel-booking/{{ booking.id }}/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    }).then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'hotel_booking:payment_failed' booking.id %}";
+        }
+        else {
+            window.location.href = "{% url 'hotel_booking:hotels_display' %}";
+        }
+    });
+}
+
+
+
+
+
+function expireBooking() {
+    return fetch("/hotels/expire-booking/{{ booking.id }}/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        }
+    }).then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'activity_booking:activities_display' %}";
+        }
+        else {
+            window.location.href = "{% url 'activity_booking:activities_display' %}";
+        }
+    });
+}
+
+
+
+
+const expiryTime = {{ expiry_time|safe }} * 1000; // convert to ms
+const timerEl = document.getElementById("timer");
+
+const interval = setInterval(() => {
+
+    const now = new Date().getTime();
+    const distance = expiryTime - now;
+
+    if (distance <= 0) {
+
+        clearInterval(interval);
+        timerEl.innerHTML = "Time Out";
+
+        console.log("Timer Out → Booking Cancelled");
+
+        expireBooking();
+
+        return;
+    }
+
+    const minutes = Math.floor(distance / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    timerEl.innerHTML = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+}, 1000);
+
+
+
+
+
+function startPayment() {
+
+    let check_in = document.getElementById("checkinDateInput").value
+    let check_out = document.getElementById("checkoutDateInput").value
+
+    fetch("{% url 'hotel_booking:create_payment_order' booking.id %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({
+            room_count: totalRooms,
+            checkin: check_in,
+            checkout: check_out
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (!data.success) {
+            alert("Select no of seats not available");
+            return;
+        }
+
+        openRazorpay(data);
+    });
+}
+
+
+function openRazorpay(data) {
+
+    var options = {
+        "key": data.key,
+        "amount": data.amount,
+        "currency": "INR",
+        "name": "TravelVerse",
+        "description": "Sports Ticket Booking",
+        "order_id": data.order_id,
+
+        "handler": function (response) {
+            verifyPayment(response);
+        },
+
+        "modal": {
+            "ondismiss": function () {
+                
+                    cancelBooking();
+                  
+            }
+        }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+}
+
+
+
+
+
+function verifyPayment(response) {
+
+    fetch("{% url 'hotel_booking:verify_payment' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify(response)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+            window.location.href = "{% url 'hotel_booking:payment_success' booking.id %}";
+        } else {
+            cancelBooking();
+        }
+    })
+    .catch(() => {
+        cancelBooking();
+    });
+}
+
+
+document.getElementById("cancelBookingBtn").addEventListener("click", function () {
+
+    if (!confirm("Are you sure you want to cancel booking?")) return;
+
+    cancelBooking()
+
+});
+
+flatpickr("#checkinDateInput", {
+    dateFormat: "Y-m-d",
+    altInput: true, 
+    altFormat: "d-m-Y", 
+    minDate: "today",
+    defaultDate: null,
+    allowInput: true
+});
+
+
+flatpickr("#checkoutDateInput", {
+    dateFormat: "Y-m-d",
+    altInput: true, 
+    altFormat: "d-m-Y", 
+    minDate: "today",
+    defaultDate: null,
+    allowInput: true
+});
+
+
+updatePriceUI();
+
+
+</script>
+
+{% endblock %}

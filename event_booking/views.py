@@ -16,7 +16,7 @@ from event_booking.payment_utils import calculate_booking_amount
 from django.db.models import Q  
 from django.db import transaction
 
-
+@login_required
 def events_display(request):
 
     clean_expired_bookings()
@@ -128,7 +128,6 @@ def filter_events(request):
     
 
 @require_POST
-@login_required
 def initiate_booking(request, event_id):     
 
     if request.method == "POST":

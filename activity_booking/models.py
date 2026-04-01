@@ -29,7 +29,7 @@ def activity_poster_image_upload_path(instance, filename):
 
 
 class Event(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, null="False", blank="False")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=False, blank=False)
     address = models.TextField(null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name="act_stadiums", null="False", blank="False")
     title=models.CharField(max_length=100, null=False, blank=False)

@@ -4,6 +4,10 @@ from .models import *
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 import re
+from django.contrib.auth.views import PasswordResetView
+from .forms import RateLimitedPasswordResetForm
+from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect
 
 def login_page(request):  
     if request.method == "GET":
@@ -174,3 +178,21 @@ def signup_page(request):
 def user_logout(request):
     logout(request)  
     return redirect('booking_app:index_page')
+
+
+
+
+
+class CustomPasswordResetView(PasswordResetView):
+
+    form_class = RateLimitedPasswordResetForm
+    template_name = 'accounts/password_reset_form.html'
+    email_template_name = 'accounts/password_reset_email.html'
+    subject_template_name = 'accounts/password_reset_subject.txt'
+
+    success_url = reverse_lazy('accounts:password_reset_done')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request  # Pass request to form for IP access
+        return kwargs

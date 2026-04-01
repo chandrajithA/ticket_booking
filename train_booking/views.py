@@ -198,7 +198,7 @@ def filter_trains(request):
     })
 
 
-
+@login_required
 def class_selection(request, trip_id):
 
     clean_expired_bookings()
@@ -265,7 +265,6 @@ def class_selection(request, trip_id):
     
 
 @require_POST
-@login_required
 def initiate_booking(request, trip_id):     
 
     if request.method == "POST":

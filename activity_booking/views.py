@@ -18,7 +18,7 @@ from django.db import transaction
 from django.db.models.functions import Cast
 from django.db.models import IntegerField
 
-
+@login_required
 def activities_display(request):
 
     clean_expired_bookings()
@@ -119,7 +119,6 @@ def filter_activities(request):
     
 
 @require_POST
-@login_required
 def initiate_booking(request, event_id):     
 
     if request.method == "POST":
